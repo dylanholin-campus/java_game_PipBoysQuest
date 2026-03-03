@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>UML Structuré - Pip-Boy's Quest</title>
+    <title>UML Structure - Pip-Boy's Quest</title>
 
     <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -40,18 +40,20 @@
             margin: -1.5rem -1.5rem 1.5rem -1.5rem;
         }
 
+        .class-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
         .uml-class {
             background: white;
             border: 2px solid #343a40;
             border-radius: 6px;
-            min-width: 250px;
-            margin: 1rem;
+            width: 320px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-
-        .uml-class:hover {
-            transform: scale(1.02);
         }
 
         .uml-header {
@@ -79,6 +81,8 @@
             margin: 0;
             font-size: 0.85rem;
             line-height: 1.5;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         .visibility {
@@ -86,20 +90,13 @@
             color: #28a745;
         }
 
-        .arrow {
-            text-align: center;
-            margin: 1rem 0;
-            font-size: 1.5rem;
-            color: #dc3545;
-        }
-
         .association {
             text-align: center;
-            margin: 0.5rem 0;
-            font-size: 0.8rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
             color: #495057;
             background: #e9ecef;
-            padding: 0.3rem;
+            padding: 0.4rem;
             border-radius: 4px;
         }
     </style>
@@ -111,175 +108,264 @@
     <div class="row justify-content-center">
         <div class="col-lg-11">
             <div class="uml-container">
-                <h1 class="text-center mb-4 text-dark">Diagramme de Classes UML - Pip-Boy's Quest</h1>
-                <p class="text-center text-muted mb-5">Architecture par packages avec héritage et associations explicites</p>
+                <h1 class="text-center mb-4 text-dark">Diagramme de classes UML - Pip-Boy's Quest</h1>
+                <p class="text-center text-muted mb-5">Mise a jour selon les classes Java actuelles et les nouveaux packages
+                </p>
 
-                <!-- PACKAGE MAIN -->
                 <div class="package">
-                    <div class="package-header">📦 serenadebird.pipboysquest.main</div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">
-                                    <div class="uml-stereotype">&laquo;main&raquo;</div>
-                                    Main
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>main(args: String[]): void</p>
-                                </div>
+                    <div class="package-header">package serenadebird.pipboysquest.main</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">Main</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Main()</p>
+                                <p><span class="visibility">+ </span>main(args: String[]): void</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
                             </div>
                         </div>
                     </div>
-                    <div class="association text-center">
-                        Point d'entrée → instancie Menu
-                    </div>
+                    <div class="association">Point d'entree: instancie Menu puis Game</div>
                 </div>
 
-                <!-- PACKAGE GAME -->
                 <div class="package">
-                    <div class="package-header">📦 serenadebird.pipboysquest.game</div>
-                    <div class="row align-items-start justify-content-center">
-                        <div class="col-md-5 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">Menu</div>
-                                <div class="uml-section">
-                                    <p><span class="visibility">- </span>scanner: Scanner</p>
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>showMainMenu(): void</p>
-                                    <p><span class="visibility">+ </span>askCharacterName(): String</p>
-                                    <p><span class="visibility">+ </span>chooseCharacterClass(): String</p>
-                                    <p><span class="visibility">+ </span>startGame(): Game</p>
-                                </div>
+                    <div class="package-header">package serenadebird.pipboysquest.game</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">Menu</div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>scanner: Scanner</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>showMainMenu(): int</p>
+                                <p><span class="visibility">+ </span>createCharacter(): Character</p>
+                                <p><span class="visibility">+ </span>buildCharacter(name: String, typeChoice: int): Character
+                                </p>
+                                <p><span class="visibility">+ </span>showCharacterMenu(): int</p>
+                                <p><span class="visibility">+ </span>showCharacterInfo(character: Character): void</p>
+                                <p><span class="visibility">+ </span>showOutOfBoardMessage(message: String): void</p>
+                                <p><span class="visibility">+ </span>showModifyMenu(): int</p>
+                                <p><span class="visibility">+ </span>askCharacterName(): String</p>
+                                <p><span class="visibility">+ </span>chooseCharacterType(): int</p>
+                                <p><span class="visibility">+ </span>showEndMenu(): int</p>
+                                <p><span class="visibility">+ </span>close(): void</p>
                             </div>
                         </div>
 
-                        <div class="col-md-5 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">Game</div>
-                                <div class="uml-section">
-                                    <p><span class="visibility">- </span>board: Board</p>
-                                    <p><span class="visibility">- </span>dice: Dice</p>
-                                    <p><span class="visibility">- </span>player: Character</p>
-                                    <p><span class="visibility">- </span>isOver: boolean</p>
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>start(): void</p>
-                                    <p><span class="visibility">+ </span>playTurn(): void</p>
-                                    <p><span class="visibility">+ </span>movePlayer(steps: int): void</p>
-                                    <p><span class="visibility">+ </span>checkCell(): void</p>
-                                </div>
+                        <div class="uml-class">
+                            <div class="uml-header">Game</div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>board: Board</p>
+                                <p><span class="visibility">- </span>dice: Dice</p>
+                                <p><span class="visibility">- </span>menu: Menu</p>
+                                <p><span class="visibility">- </span>player: Character</p>
+                                <p><span class="visibility">- </span>isOver: boolean</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Game(menu: Menu)</p>
+                                <p><span class="visibility">+ </span>start(): void</p>
+                                <p><span class="visibility">+ </span>playTurn(): void</p>
+                                <p><span class="visibility">+ </span>movePlayer(steps: int): void throws OutOfBoardException
+                                </p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">Dice</div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>min: int = 1</p>
+                                <p><span class="visibility">- </span>max: int = 6</p>
+                                <p><span class="visibility">- </span>random: Random</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Dice()</p>
+                                <p><span class="visibility">+ </span>Dice(min: int, max: int)</p>
+                                <p><span class="visibility">+ </span>roll(): int</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
                             </div>
                         </div>
                     </div>
-                    <div class="association text-center mt-3">
-                        Game compose Board, Dice, utilise Character
-                    </div>
+                    <div class="association">Game compose Board et Dice, utilise Menu et Character</div>
                 </div>
 
-                <!-- PACKAGE BOARD & DICE -->
                 <div class="package">
-                    <div class="package-header">📦 serenadebird.pipboysquest.board & .dice</div>
-                    <div class="row align-items-start justify-content-center">
-                        <div class="col-md-5 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">Board</div>
-                                <div class="uml-section">
-                                    <p><span class="visibility">- </span>cells: List&lt;Cell&gt;</p>
-                                    <p><span class="visibility">- </span>size: int = 64</p>
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>getCell(pos: int): Cell</p>
-                                    <p><span class="visibility">+ </span>isInside(pos: int): boolean</p>
-                                </div>
+                    <div class="package-header">package serenadebird.pipboysquest.board</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">Board</div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>size: int = 64</p>
+                                <p><span class="visibility">- </span>cells: String[]</p>
                             </div>
-                        </div>
-                        <div class="col-md-5 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">Dice</div>
-                                <div class="uml-section">
-                                    <p><span class="visibility">- </span>min: int = 1</p>
-                                    <p><span class="visibility">- </span>max: int = 6</p>
-                                    <p><span class="visibility">- </span>random: Random</p>
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>roll(): int</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PACKAGE CHARACTER - HIÉRARCHIE -->
-                <div class="package">
-                    <div class="package-header">📦 serenadebird.pipboysquest.character</div>
-
-                    <!-- Character (classe mère) -->
-                    <div class="row justify-content-center mb-2">
-                        <div class="col-md-5 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">Character</div>
-                                <div class="uml-section">
-                                    <p><span class="visibility">- </span>name: String</p>
-                                    <p><span class="visibility">- </span>healthLevel: int</p>
-                                    <p><span class="visibility">- </span>attackStrength: int</p>
-                                    <p><span class="visibility">- </span>boardPosition: int</p>
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>attack(target: Character): void</p>
-                                    <p><span class="visibility">+ </span>takeDamage(amount: int): void</p>
-                                    <p><span class="visibility">+ </span>move(steps: int): void</p>
-                                    <p><span class="visibility">+ </span>isAlive(): boolean</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Héritage -->
-                    <div class="row">
-                        <div class="col-md-12 text-center">
-                            <div class="arrow">▲</div>
-                            <div class="association">Héritage (extends Character)</div>
-                        </div>
-                    </div>
-
-                    <!-- Sous-classes -->
-                    <div class="row align-items-start justify-content-center mt-3">
-                        <div class="col-md-5 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">Warrior<br><small class="uml-stereotype">(Paladin de l'Acier)</small></div>
-                                <div class="uml-section">
-                                    <p><span class="visibility">- </span>armor: String</p>
-                                    <p><span class="visibility">- </span>meleeWeapon: String</p>
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>specialAttack(): void</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-5 d-flex justify-content-center">
-                            <div class="uml-class">
-                                <div class="uml-header">Wizard<br><small class="uml-stereotype">(Savant de l'Institut)</small></div>
-                                <div class="uml-section">
-                                    <p><span class="visibility">- </span>energyLevel: int</p>
-                                    <p><span class="visibility">- </span>spellBook: List&lt;String&gt;</p>
-                                </div>
-                                <div class="uml-section uml-methods">
-                                    <p><span class="visibility">+ </span>castSpell(): void</p>
-                                </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Board()</p>
+                                <p><span class="visibility">+ </span>getStartPosition(): int</p>
+                                <p><span class="visibility">+ </span>checkCell(position: int): void</p>
+                                <p><span class="visibility">+ </span>isInside(position: int): boolean</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Légende -->
+                <div class="package">
+                    <div class="package-header">package serenadebird.pipboysquest.character</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">
+                                <div class="uml-stereotype">&laquo;abstract&raquo;</div>
+                                Character
+                            </div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>type: String</p>
+                                <p><span class="visibility">- </span>name: String</p>
+                                <p><span class="visibility">- </span>healthLevel: int</p>
+                                <p><span class="visibility">- </span>attackStrength: int</p>
+                                <p><span class="visibility">- </span>offensiveEquipment: OffensiveEquipment</p>
+                                <p><span class="visibility">- </span>defensiveEquipment: DefensiveEquipment</p>
+                                <p><span class="visibility">- </span>boardPosition: int</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Character()</p>
+                                <p><span class="visibility">+ </span>Character(type: String, name: String)</p>
+                                <p><span class="visibility">+ </span>getSpecialAction(): String {abstract}</p>
+                                <p><span class="visibility">+ </span>move(steps: int): void</p>
+                                <p><span class="visibility">+ </span>takeDamage(amount: int): void</p>
+                                <p><span class="visibility">+ </span>isAlive(): boolean</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">Warrior</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Warrior(name: String)</p>
+                                <p><span class="visibility">+ </span>getSpecialAction(): String</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">Wizard</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Wizard(name: String)</p>
+                                <p><span class="visibility">+ </span>getSpecialAction(): String</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="association">Warrior et Wizard heritent de Character</div>
+                </div>
+
+                <div class="package">
+                    <div class="package-header">package serenadebird.pipboysquest.equipment</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">
+                                <div class="uml-stereotype">&laquo;abstract&raquo;</div>
+                                OffensiveEquipment
+                            </div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>type: String</p>
+                                <p><span class="visibility">- </span>attackLevel: int</p>
+                                <p><span class="visibility">- </span>name: String</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>OffensiveEquipment()</p>
+                                <p><span class="visibility">+ </span>OffensiveEquipment(type: String, name: String, attackLevel: int)
+                                </p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">
+                                <div class="uml-stereotype">&laquo;abstract&raquo;</div>
+                                DefensiveEquipment
+                            </div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>type: String</p>
+                                <p><span class="visibility">- </span>defenseLevel: int</p>
+                                <p><span class="visibility">- </span>name: String</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>DefensiveEquipment()</p>
+                                <p><span class="visibility">+ </span>DefensiveEquipment(type: String, name: String, defenseLevel: int)
+                                </p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="package">
+                    <div class="package-header">package serenadebird.pipboysquest.equipment.offensive</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">Weapon</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Weapon()</p>
+                                <p><span class="visibility">+ </span>Weapon(name: String, attackLevel: int)</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">Spell</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Spell()</p>
+                                <p><span class="visibility">+ </span>Spell(name: String, attackLevel: int)</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="association">Weapon et Spell heritent de OffensiveEquipment</div>
+                </div>
+
+                <div class="package">
+                    <div class="package-header">package serenadebird.pipboysquest.equipment.defensive</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">Shield</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Shield()</p>
+                                <p><span class="visibility">+ </span>Shield(name: String, defenseLevel: int)</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">Potion</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Potion()</p>
+                                <p><span class="visibility">+ </span>Potion(name: String, defenseLevel: int)</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="association">Shield et Potion heritent de DefensiveEquipment</div>
+                </div>
+
+                <div class="package">
+                    <div class="package-header">package serenadebird.pipboysquest.exception</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">OutOfBoardException</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>OutOfBoardException(</p>
+                                <p>&nbsp;&nbsp;attemptedPosition: int, lastCell: int)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="association">Exception levee par Game.movePlayer(...) et captee dans Game.playTurn()</div>
+                </div>
+
                 <div class="mt-5 p-3 bg-light rounded">
-                    <h4>Légende UML</h4>
-                    <ul class="list-unstyled">
-                        <li><strong>Package</strong>: Bordure pointillée grise</li>
-                        <li><strong>Héritage</strong>: Flèche triangulaire ▲</li>
-                        <li><strong>Visibilité</strong>: <span class="visibility">+ </span>public | - privé</li>
+                    <h4>Legende UML</h4>
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Package</strong>: zone entouree en pointilles</li>
+                        <li><strong>&laquo;abstract&raquo;</strong>: classe abstraite</li>
+                        <li><strong>Visibilite</strong>: <span class="visibility">+ </span>public | - prive</li>
                     </ul>
                 </div>
             </div>
