@@ -22,6 +22,8 @@ public abstract class Character {
         this.name = name;
     }
 
+    public abstract String getSpecialAction();
+
     public void move(int steps) {
         boardPosition += steps;
         System.out.println(name + " avance a la case " + boardPosition);
@@ -62,14 +64,12 @@ public abstract class Character {
 
     @Override
     public String toString() {
-        return "Character{" +
-                "type='" + type + '\'' +
-                ", name='" + name + '\'' +
-                ", healthLevel=" + healthLevel +
-                ", attackStrength=" + attackStrength +
-                ", offensiveEquipment=" + offensiveEquipment +
-                ", defensiveEquipment=" + defensiveEquipment +
-                ", boardPosition=" + boardPosition +
-                '}';
+        return "Personnage : " + name +
+                ", Type : " + type +
+                ", Niveau de vie : " + healthLevel +
+                ", Force : " + attackStrength +
+                ", Equipement offensif : " + offensiveEquipment +
+                ", Equipement defensif : " + defensiveEquipment +
+                ", Position : " + boardPosition;
     }
 }

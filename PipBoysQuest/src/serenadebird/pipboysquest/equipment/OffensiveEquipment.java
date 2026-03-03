@@ -1,6 +1,6 @@
 package serenadebird.pipboysquest.equipment;
 
-public class OffensiveEquipment {
+public abstract class OffensiveEquipment {
     private String type;
     private int attackLevel;
     private String name;
@@ -28,11 +28,6 @@ public class OffensiveEquipment {
 
     @Override
     public String toString() {
-        return "OffensiveEquipment{" +
-                "type='" + type + '\'' +
-                ", attackLevel=" + attackLevel +
-                ", name='" + name + '\'' +
-                '}';
+        return type + " '" + name + "' (attaque +" + attackLevel + ")";
     }
 }
-
