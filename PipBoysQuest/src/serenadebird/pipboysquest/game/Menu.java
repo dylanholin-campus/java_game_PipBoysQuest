@@ -43,6 +43,10 @@ public class Menu {
         System.out.println(character.toString());
     }
 
+    public void showOutOfBoardMessage(String message) {
+        System.out.println("Depassement detecte: " + message);
+    }
+
     public int showModifyMenu() {
         System.out.println("\n--- Modifier ---");
         System.out.println("1. Changer le nom");

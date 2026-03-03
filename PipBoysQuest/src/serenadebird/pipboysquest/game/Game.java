@@ -2,6 +2,7 @@ package serenadebird.pipboysquest.game;
 
 import serenadebird.pipboysquest.board.Board;
 import serenadebird.pipboysquest.character.Character;
+import serenadebird.pipboysquest.exception.OutOfBoardException;
 
 public class Game {
     private Board board = new Board();
@@ -85,10 +86,18 @@ public class Game {
         int steps = dice.roll();
         System.out.println("De: " + steps);
 
-        movePlayer(steps);
-        if (player.getBoardPosition() > board.getSize()) {
+        try {
+            movePlayer(steps);
+        } catch (OutOfBoardException e) {
+            menu.showOutOfBoardMessage(e.getMessage());
             player.setBoardPosition(board.getSize());
+            System.out.println("Avancement: case " + player.getBoardPosition() + "/" + board.getSize());
+            board.checkCell(player.getBoardPosition());
+            System.out.println("Arrivee atteinte !");
+            isOver = true;
+            return;
         }
+
         System.out.println("Avancement: case " + player.getBoardPosition() + "/" + board.getSize());
         board.checkCell(player.getBoardPosition());
 
@@ -98,7 +107,11 @@ public class Game {
         }
     }
 
-    public void movePlayer(int steps) {
+    public void movePlayer(int steps) throws OutOfBoardException {
+        int targetPosition = player.getBoardPosition() + steps;
+        if (targetPosition > board.getSize()) {
+            throw new OutOfBoardException(targetPosition, board.getSize());
+        }
         player.move(steps);
     }
 

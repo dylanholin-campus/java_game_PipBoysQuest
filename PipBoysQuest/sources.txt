@@ -12,3 +12,4 @@ src/serenadebird/pipboysquest/equipment/offensive/Weapon.java
 src/serenadebird/pipboysquest/equipment/offensive/Spell.java
 src/serenadebird/pipboysquest/equipment/defensive/Shield.java
 src/serenadebird/pipboysquest/equipment/defensive/Potion.java
+src/serenadebird/pipboysquest/exception/OutOfBoardException.java
