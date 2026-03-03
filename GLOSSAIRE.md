@@ -64,3 +64,13 @@ Syntaxes utilisees dans mon projet
 
 - `Random` : genere un nombre aleatoire (ex. `random.nextInt(max - min + 1) + min`).
 - `toString()` : representation texte d'un objet, utile pour afficher ses infos.
+
+## Javadoc
+
+- `/** ... */` : bloc de commentaire reconnu par l'outil `javadoc` pour generer une documentation HTML.
+- Description principale : premiere phrase du bloc, utilisee comme resume dans les pages index.
+- `@param nom` : documente un parametre de methode ou constructeur.
+- `@return` : documente la valeur renvoyee par une methode.
+- `@throws TypeException` : documente les cas d'erreur leves par la methode.
+- `@Override` + Javadoc : utile pour preciser la version specialisee d'une methode heritee.
+- Generation : `javadoc -d docs/javadoc -sourcepath src -subpackages serenadebird.pipboysquest`.
