@@ -1,5 +1,12 @@
 package serenadebird.pipboysquest.board;
 
+import serenadebird.pipboysquest.board.cell.Cell;
+import serenadebird.pipboysquest.board.cell.EmptyCell;
+import serenadebird.pipboysquest.board.cell.EnemyCell;
+import serenadebird.pipboysquest.board.cell.ItemsCell;
+
+import java.util.ArrayList;
+
 /**
  * Represente le plateau de jeu lineaire.
  *
@@ -7,7 +14,7 @@ package serenadebird.pipboysquest.board;
  */
 public class Board {
     private int size = 64;
-    private String[] cells = new String[size + 1];
+    private final ArrayList<Cell> cells = new ArrayList<>();
 
     /**
      * Construit un plateau par defaut et initialise les cases speciales.
@@ -17,11 +24,24 @@ public class Board {
     }
 
     /**
-     * Initialise les cases de depart et d'arrivee.
+     * Initialise le plateau 64 cases en mode Cell.
      */
     private void initSpecialCells() {
-        cells[1] = "Depart";
-        cells[size] = "Arrivee";
+        cells.clear();
+        for (int i = 1; i <= size; i++) {
+            cells.add(new EmptyCell(i));
+        }
+
+        // Cases speciales pour exploiter le modele Cell sans casser la progression 1..64.
+        if (size >= 12) {
+            cells.set(11, new EnemyCell(12, "Raider"));
+        }
+        if (size >= 30) {
+            cells.set(29, new ItemsCell(30, "WEAPON", "Laser Rifle", 5));
+        }
+        if (size >= 52) {
+            cells.set(51, new ItemsCell(52, "POTION", "Stimpak", 4));
+        }
     }
 
     /**
@@ -39,8 +59,21 @@ public class Board {
      * @param position position a verifier
      */
     public void checkCell(int position) {
-        if (position >= 1 && position <= size && cells[position] != null) {
-            System.out.println("Case speciale: " + cells[position]);
+        if (!isInside(position)) {
+            return;
+        }
+        if (position == 1) {
+            System.out.println("Case speciale: Depart");
+            return;
+        }
+        if (position == size) {
+            System.out.println("Case speciale: Arrivee");
+            return;
+        }
+
+        Cell currentCell = cells.get(position - 1);
+        if (!(currentCell instanceof EmptyCell)) {
+            System.out.println("Case speciale: " + currentCell);
         }
     }
 
@@ -68,23 +101,15 @@ public class Board {
      */
     public void setSize(int size) {
         this.size = size;
-        this.cells = new String[size + 1];
         initSpecialCells();
     }
 
     /**
-     * Retourne le tableau interne des cases.
+     * Retourne la liste interne des cases.
      *
-     * @return tableau des cases
+     * @return liste des cases
      */
-    public String[] getCells() { return cells; }
-
-    /**
-     * Remplace le tableau interne des cases.
-     *
-     * @param cells nouveau tableau des cases
-     */
-    public void setCells(String[] cells) { this.cells = cells; }
+    public ArrayList<Cell> getCells() { return cells; }
 
     /**
      * Retourne une representation textuelle du plateau.

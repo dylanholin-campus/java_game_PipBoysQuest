@@ -3,6 +3,10 @@ src/serenadebird/pipboysquest/game/Dice.java
 src/serenadebird/pipboysquest/game/Game.java
 src/serenadebird/pipboysquest/main/Main.java
 src/serenadebird/pipboysquest/board/Board.java
+src/serenadebird/pipboysquest/board/cell/Cell.java
+src/serenadebird/pipboysquest/board/cell/EmptyCell.java
+src/serenadebird/pipboysquest/board/cell/EnemyCell.java
+src/serenadebird/pipboysquest/board/cell/ItemsCell.java
 src/serenadebird/pipboysquest/character/Wizard.java
 src/serenadebird/pipboysquest/character/Warrior.java
 src/serenadebird/pipboysquest/character/Character.java
