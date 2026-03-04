@@ -49,21 +49,36 @@ Syntaxes utilisees dans mon projet
 - `while` : repete un bloc tant que la condition est vraie (ex. boucle principale du jeu).
 - Comparaisons : `==`, `>=`, `<=`, `>` pour comparer des nombres.
 
-## Tableaux
+## Tableaux et Collections
 
-- Declaration : `String[] cells` (collection d'elements de meme type, taille fixe).
-- Acces : `cells[position]` pour lire/modifier un element a un index.
+- `String[] cells` : structure de donnees de taille fixe (ex. `String[65]`).
+- `ArrayList<Cell>` : collection dynamique qui peut changer de taille. Plus flexible qu'un tableau classique.
+- `<Type>` : syntaxe des "Generics", permet de preciser quel type d'objets contient la collection (ex. `ArrayList<Cell>`).
+- `add(objet)` : ajoute un element a la fin de la liste.
+- `get(index)` : recupere l'element a la position donnee (attention, les index commencent a 0).
+- `set(index, objet)` : remplace l'element existant a l'index specifie.
+- `size()` : retourne le nombre d'elements dans la liste (equivalent de `.length` pour un tableau).
+- `clear()` : vide completement la collection.
 
-## I/O console
+## Exceptions
 
-- `System.out.print/println(...)` : affiche un message dans la console.
-- `Scanner` + `nextLine()` : lit une ligne entree utilisateur.
-- `Integer.parseInt(...)` : convertit une chaine en entier.
+- `Exception` : classe de base pour signaler une erreur ou un comportement inattendu pendant l'execution.
+- `extends Exception` : permet de creer sa propre erreur personnalisee (ex. `OutOfBoardException`).
+- `throw new ...` : declenche manuellement une exception quand une regle metier est violee.
+- `throws ...` : declare dans la signature d'une methode qu'elle peut renvoyer une erreur que l'appelant devra gerer.
+- `try { ... } catch (Type e) { ... }` : bloc permettant d'executer du code "a risque" et d'attraper l'erreur pour eviter que le programme ne plante (ex. gerer le depassement de plateau).
+- `getMessage()` : methode pour recuperer le texte explicatif associe a l'erreur.
+
+## Polymorphisme et types
+
+- `instanceof` : operateur permettant de verifier si un objet appartient a une classe precise (ex. `currentCell instanceof EmptyCell`). Utile pour filtrer les affichages.
+- `List` / `ArrayList` : separation entre l'interface (contrat) et l'implementation (le code reel).
 
 ## Utilitaires
 
 - `Random` : genere un nombre aleatoire (ex. `random.nextInt(max - min + 1) + min`).
-- `toString()` : representation texte d'un objet, utile pour afficher ses infos.
+- `Dice "pipe"` : de qui renvoie toujours la meme valeur (ici `1`) pour faciliter les tests de logique de deplacement.
+- `toString()` : representation texte d'un objet. Dans ce projet, chaque type de `Cell` l'utilise pour decrire son contenu au joueur.
 
 ## Javadoc
 

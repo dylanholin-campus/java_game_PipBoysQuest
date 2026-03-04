@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class Board {
     private int size = 64;
     private final ArrayList<Cell> cells = new ArrayList<>();
+    // Type générique - liste typée qui ne contient que des objets Cell
 
     /**
      * Construit un plateau par defaut et initialise les cases speciales.

@@ -132,9 +132,6 @@
                     <div class="class-grid">
                         <div class="uml-class">
                             <div class="uml-header">Menu</div>
-                            <div class="uml-section uml-attributes">
-                                <p><span class="visibility">- </span>scanner: Scanner</p>
-                            </div>
                             <div class="uml-section uml-methods">
                                 <p><span class="visibility">+ </span>showMainMenu(): int</p>
                                 <p><span class="visibility">+ </span>createCharacter(): Character</p>
@@ -161,7 +158,7 @@
                                 <p><span class="visibility">- </span>isOver: boolean</p>
                             </div>
                             <div class="uml-section uml-methods">
-                                <p><span class="visibility">+ </span>Game(menu: Menu)</p>
+                                <p><span class="visibility">+ </span>Game(gameMenu: Menu)</p>
                                 <p><span class="visibility">+ </span>start(): void</p>
                                 <p><span class="visibility">+ </span>playTurn(): void</p>
                                 <p><span class="visibility">+ </span>movePlayer(steps: int): void throws OutOfBoardException
@@ -195,17 +192,73 @@
                             <div class="uml-header">Board</div>
                             <div class="uml-section uml-attributes">
                                 <p><span class="visibility">- </span>size: int = 64</p>
-                                <p><span class="visibility">- </span>cells: String[]</p>
+                                <p><span class="visibility">- </span>cells: ArrayList&lt;Cell&gt;</p>
                             </div>
                             <div class="uml-section uml-methods">
                                 <p><span class="visibility">+ </span>Board()</p>
                                 <p><span class="visibility">+ </span>getStartPosition(): int</p>
                                 <p><span class="visibility">+ </span>checkCell(position: int): void</p>
                                 <p><span class="visibility">+ </span>isInside(position: int): boolean</p>
+                                <p><span class="visibility">+ </span>getSize(): int</p>
+                                <p><span class="visibility">+ </span>getCells(): ArrayList&lt;Cell&gt;</p>
                                 <p><span class="visibility">+ </span>toString(): String</p>
                             </div>
                         </div>
                     </div>
+                    <div class="association">Board contient une liste de Cell</div>
+                </div>
+
+                <div class="package">
+                    <div class="package-header">package serenadebird.pipboysquest.board.cell</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">
+                                <div class="uml-stereotype">&laquo;abstract&raquo;</div>
+                                Cell
+                            </div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>position: int</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>Cell(position: int)</p>
+                                <p><span class="visibility">+ </span>getPosition(): int</p>
+                                <p><span class="visibility">+ </span>toString(): String {abstract}</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">EmptyCell</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>EmptyCell(position: int)</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">EnemyCell</div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>enemyName: String</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>EnemyCell(position: int, name: String)</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+
+                        <div class="uml-class">
+                            <div class="uml-header">ItemsCell</div>
+                            <div class="uml-section uml-attributes">
+                                <p><span class="visibility">- </span>itemType: String</p>
+                                <p><span class="visibility">- </span>itemName: String</p>
+                                <p><span class="visibility">- </span>itemValue: int</p>
+                            </div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>ItemsCell(pos: int, type: String, name: String, val: int)</p>
+                                <p><span class="visibility">+ </span>toString(): String</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="association">EmptyCell, EnemyCell et ItemsCell heritent de Cell</div>
                 </div>
 
                 <div class="package">
