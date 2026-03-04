@@ -10,8 +10,6 @@ import java.util.Scanner;
  * Gere l'affichage console des menus et la lecture des saisies utilisateur.
  */
 public class Menu {
-    private Scanner scanner = new Scanner(System.in);
-
     /**
      * Construit un menu base sur l'entree standard.
      */
@@ -122,25 +120,13 @@ public class Menu {
     }
 
     /**
-     * Ferme le scanner de saisie console.
+     * Ferme les ressources du menu.
+     *
+     * <p>Aucune ressource persistante n'est conservee dans cette classe.</p>
      */
     public void close() {
-        scanner.close();
+        // Pas d'etat interne a fermer (pas d'attribut Scanner).
     }
-
-    /**
-     * Retourne le scanner utilise pour lire les saisies utilisateur.
-     *
-     * @return scanner courant
-     */
-    public Scanner getScanner() { return scanner; }
-
-    /**
-     * Remplace le scanner utilise pour la lecture des saisies.
-     *
-     * @param scanner nouveau scanner
-     */
-    public void setScanner(Scanner scanner) { this.scanner = scanner; }
 
     /**
      * Retourne une representation textuelle du menu.
@@ -149,9 +135,7 @@ public class Menu {
      */
     @Override
     public String toString() {
-        return "Menu{" +
-                "scanner=" + scanner +
-                '}';
+        return "Menu{}";
     }
 
     /**
@@ -163,6 +147,7 @@ public class Menu {
      * @return entier valide compris entre min et max
      */
     private int readIntInRange(String prompt, int min, int max) {
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print(prompt);
             String raw = scanner.nextLine();
@@ -185,6 +170,7 @@ public class Menu {
      * @return texte valide non vide
      */
     private String readNonEmpty(String prompt) {
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print(prompt);
             String value = scanner.nextLine().trim();

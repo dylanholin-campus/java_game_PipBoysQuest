@@ -8,20 +8,21 @@ import serenadebird.pipboysquest.exception.OutOfBoardException;
  * Contient la logique de jeu: menus, boucle de partie et deplacements.
  */
 public class Game {
-    private Board board = new Board();
-    private Dice dice = new Dice();
-    private Menu menu;
-    private Character player;
-    private boolean isOver = false;
+        private Board board = new Board();
+        private Dice dice = new Dice();
+        private Menu menu;
+        private Character player;
+        private boolean isOver = false;
 
-    /**
-     * Construit une partie avec l'instance de menu utilisee pour les interactions.
-     *
-     * @param menu menu d'entree/sortie console
-     */
-    public Game(Menu menu) {
-        this.menu = menu;
-    }
+        /**
+         * Construit une partie avec l'instance de menu utilisee pour les interactions.
+         *
+         * @param gameMenu menu d'entree/sortie console
+         */
+        public Game(Menu gameMenu) {
+            // `this.menu` = attribut de la classe, `gameMenu` = parametre recu.
+            this.menu = gameMenu;
+        } // "Prends le menu qu'on m'a envoyé en paramètre à droite, et range-le dans MON attribut personnel menu à gauche".
 
     /**
      * Demarre la boucle principale de l'application.
@@ -76,7 +77,7 @@ public class Game {
     private boolean playGame() {
         isOver = false;
         player.setBoardPosition(board.getStartPosition());
-        while (!isOver) {
+        while (!isOver) { // tant que la partie n'est PAS terminée
             playTurn();
         }
         int endChoice = menu.showEndMenu();
