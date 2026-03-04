@@ -2,36 +2,28 @@ package serenadebird.pipboysquest.main;
 
 import serenadebird.pipboysquest.game.Game;
 import serenadebird.pipboysquest.game.Menu;
+import serenadebird.pipboysquest.db.DatabaseManager;
 
-/**
- * Point d'entree de l'application PipBoysQuest.
- * Cette classe instancie les composants principaux puis lance la boucle de jeu.
- */
 public class Main {
-    /**
-     * Constructeur vide.
-     */
-    public Main() {
-    }
+    public Main() {}
 
-    /**
-     * Demarre le jeu console.
-     *
-     * @param args arguments de ligne de commande (non utilises)
-     */
     public static void main(String[] args) {
-        Menu menu = new Menu();
-        Game game = new Game(menu);
-        game.start();
-    }
+        // 1. Initialisation de la BDD
+        DatabaseManager db = new DatabaseManager();
 
-    /**
-     * Retourne une representation textuelle minimale de la classe.
-     *
-     * @return description de l'instance
-     */
-    @Override
-    public String toString() {
-        return "Main{}";
+        // 2. Affichage des héros existants (Consigne : au démarrage du jeu)
+        db.getHeroes();
+        System.out.println("--------------------------------\n");
+
+        // 3. Lancement du jeu
+        Menu menu = new Menu();
+
+        // On passe 'db' au Game pour qu'il puisse sauvegarder pendant la partie
+        Game game = new Game(menu, db);
+
+        game.start();
+
+        // 4. Fermeture propre quand on quitte le jeu
+        db.fermerConnexion();
     }
 }

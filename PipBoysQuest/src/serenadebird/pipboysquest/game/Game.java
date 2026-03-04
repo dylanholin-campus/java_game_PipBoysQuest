@@ -3,36 +3,37 @@ package serenadebird.pipboysquest.game;
 import serenadebird.pipboysquest.board.Board;
 import serenadebird.pipboysquest.character.Character;
 import serenadebird.pipboysquest.exception.OutOfBoardException;
+import serenadebird.pipboysquest.db.DatabaseManager; // <- Nouvel import
 
-/**
- * Contient la logique de jeu: menus, boucle de partie et deplacements.
- */
 public class Game {
-        private Board board = new Board();
-        private Dice dice = new Dice();
-        private Menu menu;
-        private Character player;
-        private boolean isOver = false;
+    private Board board = new Board();
+    private Dice dice = new Dice();
+    private Menu menu;
+    private Character player;
+    private boolean isOver = false;
 
-        /**
-         * Construit une partie avec l'instance de menu utilisee pour les interactions.
-         *
-         * @param gameMenu menu d'entree/sortie console
-         */
-        public Game(Menu gameMenu) {
-            // `this.menu` = attribut de la classe, `gameMenu` = parametre recu.
-            this.menu = gameMenu;
-        } // "Prends le menu qu'on m'a envoyé en paramètre à droite, et range-le dans MON attribut personnel menu à gauche".
+    // NOUVEAU : le gestionnaire de base de données
+    private DatabaseManager db;
 
     /**
-     * Demarre la boucle principale de l'application.
+     * NOUVEAU CONSTRUCTEUR : prend le menu ET la base de données.
      */
+    public Game(Menu gameMenu, DatabaseManager dbManager) {
+        this.menu = gameMenu;
+        this.db = dbManager; // On stocke la connexion pour l'utiliser plus tard
+    }
+
     public void start() {
         boolean running = true;
         while (running) {
             int mainChoice = menu.showMainMenu();
             if (mainChoice == 1) {
+                // 1. Création du personnage via le menu
                 player = menu.createCharacter();
+
+                // --- CONSIGNE : Sauvegarder le héros en BDD après création ---
+                db.createHero(player);
+
                 player.setBoardPosition(board.getStartPosition());
                 running = handleCharacterMenu();
             } else {
@@ -42,11 +43,6 @@ public class Game {
         menu.close();
     }
 
-    /**
-     * Gere les actions disponibles depuis le menu personnage.
-     *
-     * @return true pour revenir au menu principal, false pour quitter
-     */
     private boolean handleCharacterMenu() {
         boolean stayInCharacterMenu = true;
         while (stayInCharacterMenu) {
@@ -69,24 +65,16 @@ public class Game {
         return true;
     }
 
-    /**
-     * Execute une partie complete jusqu'a la fin du plateau.
-     *
-     * @return true si le joueur veut recommencer, false sinon
-     */
     private boolean playGame() {
         isOver = false;
         player.setBoardPosition(board.getStartPosition());
-        while (!isOver) { // tant que la partie n'est PAS terminée
+        while (!isOver) {
             playTurn();
         }
         int endChoice = menu.showEndMenu();
         return endChoice == 1;
     }
 
-    /**
-     * Gere la modification du personnage courant.
-     */
     private void handleModifyMenu() {
         boolean stay = true;
         while (stay) {
@@ -94,19 +82,28 @@ public class Game {
             if (choice == 1) {
                 String newName = menu.askCharacterName();
                 player.setName(newName);
+
+                // --- CONSIGNE : Mettre à jour en BDD après modification ---
+                db.editHero(player);
+
             } else if (choice == 2) {
+                // Si on change de type, on doit recréer l'objet mais garder le même ID BDD
+                int oldId = player.getId();
                 int typeChoice = menu.chooseCharacterType();
                 player = menu.buildCharacter(player.getName(), typeChoice);
+                player.setId(oldId); // On lui redonne son ID
+
                 player.setBoardPosition(board.getStartPosition());
+
+                // --- CONSIGNE : Mettre à jour en BDD après modification ---
+                db.editHero(player);
+
             } else {
                 stay = false;
             }
         }
     }
 
-    /**
-     * Joue un tour: lancer de de, deplacement, verification d'arrivee.
-     */
     public void playTurn() {
         System.out.println("\n--- Tour ---");
         System.out.println("Position: case " + player.getBoardPosition() + "/" + board.getSize());
@@ -129,18 +126,18 @@ public class Game {
         System.out.println("Avancement: case " + player.getBoardPosition() + "/" + board.getSize());
         board.checkCell(player.getBoardPosition());
 
+        // --- SIMULATION DE DEGATS POUR VALIDER LA CONSIGNE ---
+        // (Juste pour l'exercice, on lui enlève 1 PV à chaque tour pour tester la méthode BDD)
+        player.takeDamage(1);
+        System.out.println("Le voyage vous fatigue... (-1 PV)");
+        db.changeLifePoints(player); // <-- CONSIGNE : Mise à jour des PV en BDD
+
         if (player.getBoardPosition() >= board.getSize()) {
             System.out.println("Arrivee atteinte !");
             isOver = true;
         }
     }
 
-    /**
-     * Deplace le joueur et leve une exception si la case cible depasse le plateau.
-     *
-     * @param steps nombre de cases a avancer
-     * @throws OutOfBoardException si la case cible depasse la case finale
-     */
     public void movePlayer(int steps) throws OutOfBoardException {
         int targetPosition = player.getBoardPosition() + steps;
         if (targetPosition > board.getSize()) {
@@ -149,89 +146,20 @@ public class Game {
         player.move(steps);
     }
 
-    /**
-     * Retourne le plateau utilise par la partie.
-     *
-     * @return plateau de jeu
-     */
+    // --- GETTERS ET SETTERS ---
     public Board getBoard() { return board; }
-
-    /**
-     * Remplace le plateau utilise par la partie.
-     *
-     * @param board nouveau plateau de jeu
-     */
     public void setBoard(Board board) { this.board = board; }
-
-    /**
-     * Retourne le de utilise pour les tours.
-     *
-     * @return de de jeu
-     */
     public Dice getDice() { return dice; }
-
-    /**
-     * Remplace le de utilise pour les tours.
-     *
-     * @param dice nouveau de
-     */
     public void setDice(Dice dice) { this.dice = dice; }
-
-    /**
-     * Retourne le menu associe a la partie.
-     *
-     * @return menu associe a la partie
-     */
     public Menu getMenu() { return menu; }
-
-    /**
-     * Remplace le menu associe a la partie.
-     *
-     * @param menu nouveau menu
-     */
     public void setMenu(Menu menu) { this.menu = menu; }
-
-    /**
-     * Retourne le personnage joueur courant.
-     *
-     * @return personnage joueur
-     */
     public Character getPlayer() { return player; }
-
-    /**
-     * Remplace le personnage joueur courant.
-     *
-     * @param player nouveau personnage joueur
-     */
     public void setPlayer(Character player) { this.player = player; }
-
-    /**
-     * Indique si la partie est terminee.
-     *
-     * @return true si la partie est terminee
-     */
     public boolean isOver() { return isOver; }
-
-    /**
-     * Met a jour l'etat de fin de partie.
-     *
-     * @param over nouvel etat de fin de partie
-     */
     public void setOver(boolean over) { isOver = over; }
 
-    /**
-     * Retourne une representation textuelle de l'etat de jeu.
-     *
-     * @return description de l'instance
-     */
     @Override
     public String toString() {
-        return "Game{" +
-                "board=" + board +
-                ", dice=" + dice +
-                ", menu=" + menu +
-                ", player=" + player +
-                ", isOver=" + isOver +
-                '}';
+        return "Game{board=" + board + ", player=" + player + "}";
     }
 }

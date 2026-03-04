@@ -17,6 +17,7 @@ public abstract class Character {
     private OffensiveEquipment offensiveEquipment;
     private DefensiveEquipment defensiveEquipment;
     private int boardPosition = 1;
+    private int id = 0;
 
     /**
      * Construit un personnage par defaut.
@@ -172,7 +173,8 @@ public abstract class Character {
      * @param pos nouvelle position sur le plateau
      */
     public void setBoardPosition(int pos) { boardPosition = pos; }
-
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
     /**
      * Retourne un resume lisible du personnage.
      *
