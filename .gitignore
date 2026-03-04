@@ -10,7 +10,8 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files
+# Package Files - Ne pas ignorer les JAR de lib necessaires (ex: driver JDBC)
+!PipBoysQuest/lib/*.jar
 *.jar
 *.war
 *.nar
@@ -36,4 +37,5 @@ replay_pid*
 /bin/
 
 # Javadoc / Generated documentation
+# Decommenter si vous voulez ignorer la javadoc locale (mais utile pour l'hoster sur GitHub Pages)
 docs/
