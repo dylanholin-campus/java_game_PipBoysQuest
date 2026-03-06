@@ -4,7 +4,7 @@ Syntaxes utilisees dans mon projet
 
 ## Organisation du code
 
-- `package` : declare le package de la classe, ce qui organise le code par dossier. Exemple : `serenadebird.pipboysquest.game` correspond au dossier `serenadebird/pipboysquest/game`.
+- `package` : declare le package de la classe, ce qui organise le code par dossier. Exemple : `serenadebird.pipboysquest.game` correspond au dossier `/pipboysquest/game`
 - `import` : rend une classe d'un autre package utilisable sans son nom complet. Exemple : `import java.util.Scanner` pour lire le clavier.
 - `class` : declare une classe concrete instanciable (ex. `public class Game`).
 - `abstract class` : classe abstraite, sert de base et ne peut pas etre instanciee directement (ex. `Character`).

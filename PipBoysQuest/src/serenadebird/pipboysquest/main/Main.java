@@ -11,6 +11,9 @@ public class Main {
         // 1. Initialisation de la BDD
         DatabaseManager db = new DatabaseManager();
 
+        // Seed transparent: ajoute les catalogues seulement si les tables sont vides.
+        db.seedCatalogsIfEmpty();
+
         // 2. Affichage des héros existants (Consigne : au démarrage du jeu)
         db.getHeroes();
         System.out.println("--------------------------------\n");

@@ -3,24 +3,23 @@ package serenadebird.pipboysquest.game;
 import serenadebird.pipboysquest.board.Board;
 import serenadebird.pipboysquest.character.Character;
 import serenadebird.pipboysquest.exception.OutOfBoardException;
-import serenadebird.pipboysquest.db.DatabaseManager; // <- Nouvel import
+import serenadebird.pipboysquest.db.DatabaseManager;
 
 public class Game {
-    private Board board = new Board();
+    private Board board;
     private Dice dice = new Dice();
     private Menu menu;
     private Character player;
     private boolean isOver = false;
 
-    // NOUVEAU : le gestionnaire de base de données
     private DatabaseManager db;
 
-    /**
-     * NOUVEAU CONSTRUCTEUR : prend le menu ET la base de données.
-     */
     public Game(Menu gameMenu, DatabaseManager dbManager) {
         this.menu = gameMenu;
-        this.db = dbManager; // On stocke la connexion pour l'utiliser plus tard
+        this.db = dbManager;
+
+        // Version simplifiee demandee par la consigne de diversification.
+        this.board = new Board(10);
     }
 
     public void start() {
@@ -28,10 +27,7 @@ public class Game {
         while (running) {
             int mainChoice = menu.showMainMenu();
             if (mainChoice == 1) {
-                // 1. Création du personnage via le menu
                 player = menu.createCharacter();
-
-                // --- CONSIGNE : Sauvegarder le héros en BDD après création ---
                 db.createHero(player);
 
                 player.setBoardPosition(board.getStartPosition());
@@ -68,6 +64,10 @@ public class Game {
     private boolean playGame() {
         isOver = false;
         player.setBoardPosition(board.getStartPosition());
+
+        // Verification explicite des toString() des cases du plateau.
+        board.printCellsOverview();
+
         while (!isOver) {
             playTurn();
         }
@@ -82,20 +82,15 @@ public class Game {
             if (choice == 1) {
                 String newName = menu.askCharacterName();
                 player.setName(newName);
-
-                // --- CONSIGNE : Mettre à jour en BDD après modification ---
                 db.editHero(player);
 
             } else if (choice == 2) {
-                // Si on change de type, on doit recréer l'objet mais garder le même ID BDD
                 int oldId = player.getId();
                 int typeChoice = menu.chooseCharacterType();
                 player = menu.buildCharacter(player.getName(), typeChoice);
-                player.setId(oldId); // On lui redonne son ID
+                player.setId(oldId);
 
                 player.setBoardPosition(board.getStartPosition());
-
-                // --- CONSIGNE : Mettre à jour en BDD après modification ---
                 db.editHero(player);
 
             } else {
@@ -126,11 +121,9 @@ public class Game {
         System.out.println("Avancement: case " + player.getBoardPosition() + "/" + board.getSize());
         board.checkCell(player.getBoardPosition());
 
-        // --- SIMULATION DE DEGATS POUR VALIDER LA CONSIGNE ---
-        // (Juste pour l'exercice, on lui enlève 1 PV à chaque tour pour tester la méthode BDD)
         player.takeDamage(1);
         System.out.println("Le voyage vous fatigue... (-1 PV)");
-        db.changeLifePoints(player); // <-- CONSIGNE : Mise à jour des PV en BDD
+        db.changeLifePoints(player);
 
         if (player.getBoardPosition() >= board.getSize()) {
             System.out.println("Arrivee atteinte !");
@@ -146,7 +139,6 @@ public class Game {
         player.move(steps);
     }
 
-    // --- GETTERS ET SETTERS ---
     public Board getBoard() { return board; }
     public void setBoard(Board board) { this.board = board; }
     public Dice getDice() { return dice; }

@@ -4,6 +4,15 @@ import serenadebird.pipboysquest.board.cell.Cell;
 import serenadebird.pipboysquest.board.cell.EmptyCell;
 import serenadebird.pipboysquest.board.cell.EnemyCell;
 import serenadebird.pipboysquest.board.cell.ItemsCell;
+import serenadebird.pipboysquest.enemy.Dragon;
+import serenadebird.pipboysquest.enemy.Goblin;
+import serenadebird.pipboysquest.enemy.Sorcerer;
+import serenadebird.pipboysquest.equipment.defensive.LargePotion;
+import serenadebird.pipboysquest.equipment.defensive.StandardPotion;
+import serenadebird.pipboysquest.equipment.offensive.Fireball;
+import serenadebird.pipboysquest.equipment.offensive.Lightning;
+import serenadebird.pipboysquest.equipment.offensive.Mace;
+import serenadebird.pipboysquest.equipment.offensive.Sword;
 
 import java.util.ArrayList;
 
@@ -15,17 +24,26 @@ import java.util.ArrayList;
 public class Board {
     private int size = 64;
     private final ArrayList<Cell> cells = new ArrayList<>();
-    // Type générique - liste typée qui ne contient que des objets Cell
 
     /**
-     * Construit un plateau par defaut et initialise les cases speciales.
+     * Construit un plateau 64 cases par defaut.
      */
     public Board() {
         initSpecialCells();
     }
 
     /**
-     * Initialise le plateau 64 cases en mode Cell.
+     * Construit un plateau personnalise (ex: 10 cases pour la version simplifiee).
+     *
+     * @param size taille souhaitee
+     */
+    public Board(int size) {
+        this.size = size;
+        initSpecialCells();
+    }
+
+    /**
+     * Initialise les cases speciales selon la taille du plateau.
      */
     private void initSpecialCells() {
         cells.clear();
@@ -33,7 +51,12 @@ public class Board {
             cells.add(new EmptyCell(i));
         }
 
-        // Cases speciales pour exploiter le modele Cell sans casser la progression 1..64.
+        if (size == 10) {
+            initTrainingBoard();
+            return;
+        }
+
+        // Plateau principal 64 cases.
         if (size >= 12) {
             cells.set(11, new EnemyCell(12, "Raider"));
         }
@@ -42,6 +65,32 @@ public class Board {
         }
         if (size >= 52) {
             cells.set(51, new ItemsCell(52, "POTION", "Stimpak", 4));
+        }
+    }
+
+    /**
+     * Initialise le plateau simplifie (10 cases) avec une instance de chaque type demande.
+     */
+    private void initTrainingBoard() {
+        cells.set(1, new EnemyCell(2, new Dragon()));
+        cells.set(2, new EnemyCell(3, new Sorcerer()));
+        cells.set(3, new EnemyCell(4, new Goblin()));
+
+        cells.set(4, new ItemsCell(5, new Mace()));
+        cells.set(5, new ItemsCell(6, new Sword()));
+        cells.set(6, new ItemsCell(7, new Lightning()));
+        cells.set(7, new ItemsCell(8, new Fireball()));
+        cells.set(8, new ItemsCell(9, new StandardPotion()));
+        cells.set(9, new ItemsCell(10, new LargePotion()));
+    }
+
+    /**
+     * Affiche toutes les cases du plateau via leur toString().
+     */
+    public void printCellsOverview() {
+        System.out.println("\n--- Apercu du plateau (" + size + " cases) ---");
+        for (Cell cell : cells) {
+            System.out.println(cell);
         }
     }
 

@@ -1,70 +1,79 @@
 # PipBoysQuest
 
-Un jeu d'aventure en Java inspiré de l'univers Donjons et Dragons, adapté à la licence Fallout : créez un personnage et faites-le progresser sur un plateau.
+Jeu d'aventure en Java inspire de Donjons & Dragons, adapte a l'univers Fallout.
+Le joueur cree son personnage, explore un plateau et progresse avec sauvegarde en base MySQL.
 
-## 🚀 Fonctionnalités
+## Fonctionnalites
 
-- **Système D&D à la sauce Fallout** : Incarnez un membre de la Confrérie de l'Acier (chevalier ou scribe) avec son propre équipement de départ.
-- **Exploration des Terres désolées** : Parcourez un plateau de jeu de 64 cases parsemé d'embûches et de découvertes.
-- **Arsenal Post-Apo** : Équipez-vous de Fusils Laser, Pistolets Gamma, Armures assistées ou Stimpaks pour survivre.
-- **Rencontres hostiles** : Affrontez des Raiders et d'autres dangers typiques de la licence lors de vos déplacements.
-- **Interface Pip-Boy** : Un menu console épuré simulant l'interface de votre assistant électronique.
-- **Sauvegarde BDD** : Création et progression de personnages sauvegardées en temps réel dans une base MySQL.
+- Ambiance Fallout (Confrerie, Terres desolees, loots, zones hostiles).
+- Creation de personnage (Warrior/Wizard) et gestion via menu console.
+- Plateau de jeu avec cases speciales (ennemis, objets, cases vides).
+- Sauvegarde des heros et de leur progression en base MySQL.
+- Catalogues BDD dedies pour ennemis et objets (`enemy_catalog`, `item_catalog`).
 
-## 🛠 Prérequis / Technos utilisées
+## Prerequis
 
-- **Java** : JDK 17+ recommandé
-- **MySQL** : Serveur de base de données local (ex: XAMPP, WAMP, ou installation native)
-- **Concepts POO** : Encapsulation, Héritage, Abstraction, Polymorphisme
-- **Collections** : `ArrayList`, Génériques
-- **Persistance** : **JDBC** (Java Database Connectivity)
-- **Documentation** : Javadoc & UML
+- Java JDK 17+
+- MySQL (local)
+- Adminer (recommande) ou autre client SQL
 
-## 🗺 Documentation
+## Documentation
 
-- **Schéma UML** : [Voir le diagramme](https://dylanholin-campus.github.io/java_game_PipBoysQuest/)
-- **Javadoc** : Générée localement dans `PipBoysQuest/docs/javadoc/index.html`
+- Schema UML : https://dylanholin-campus.github.io/java_game_PipBoysQuest/
+- Javadoc locale : `PipBoysQuest/docs/javadoc/index.html`
 
-## ⚙️ Installation et Configuration
+## Installation (utilisateur)
 
-### 1. Configuration de la Base de Données
+### 1) Recuperer le projet
 
-Avant de lancer le jeu, configurez votre environnement MySQL :
-
-1. **Assurez-vous que MySQL est actif** (via XAMPP, WAMP ou service natif).
-2. **Accès via Adminer** : 
-   - Lancez **Adminer** (ou PHPMyAdmin).
-   - Créez une base de données nommée `boutique`.
-   - Utilisez l'onglet **Requête SQL** (ou Import) d'Adminer pour exécuter le script `init_db.sql` situé à la racine du projet afin de générer la table `character`.
-3. **Configurez vos accès** : modifiez les identifiants dans `src/serenadebird/pipboysquest/db/DatabaseManager.java` :
-   ```java
-   // Ligne 14 à 16 :
-   String url = "jdbc:mysql://localhost:3306/boutique";
-   String user = "VOTRE_USER";      // ex: "root"
-   String password = "VOTRE_MDP";   // laissez vide "" si pas de mot de passe
-   ```
-
-### 2. Compilation et Exécution (Mode Terminal)
-
-Depuis la racine du projet (`java_game_PipBoysQuest/`) :
-
-```bash
-# Entrer dans le dossier du projet
-cd PipBoysQuest
-
-# Compiler toutes les classes via le fichier sources.txt
-javac -d bin -cp "lib/*" @sources.txt
-
-# Lancer l'aventure
-java -cp "bin:lib/*" serenadebird.pipboysquest.main.Main
+```zsh
+git clone <url-du-repo>
+cd java_game_PipBoysQuest
 ```
 
-> **Note aux développeurs** : Si vous utilisez IntelliJ IDEA, pensez à ajouter les bibliothèques du dossier `lib/` au *Project Structure > Libraries* pour éviter les erreurs de compilation JDBC.
+### 2) Initialiser la base MySQL avec Adminer
 
-## 📚 Documentation technique
+- Ouvrir Adminer et se connecter a votre serveur MySQL
+- Executer le script `init_db.sql` a la racine du projet
+- Le script cree (ou recree) la base `boutique` et les tables :
+  - `character`
+  - `enemy_catalog`
+  - `item_catalog`
+
+### 3) Configurer les identifiants BDD (sans modifier le code)
+
+Le projet lit ces variables d'environnement :
+
+- `DB_URL`
+- `DB_USER`
+- `DB_PASSWORD`
+
+Exemple (session terminal Linux/macOS) :
+
+```zsh
+export DB_URL='jdbc:mysql://localhost:3306/boutique?useSSL=false&serverTimezone=UTC'
+export DB_USER='root'
+export DB_PASSWORD='votre_mot_de_passe'
+```
+
+> Si ces variables ne sont pas definies, le code utilise les valeurs de dev (`dev`/`dev`).
+
+### 4) Compiler et lancer
 
 Depuis le dossier `PipBoysQuest/` :
 
-```bash
+```zsh
+cd PipBoysQuest
+javac -cp .:../lib/mysql-connector.jar @sources.txt
+java -cp .:src:../lib/mysql-connector.jar serenadebird.pipboysquest.main.Main
+```
+
+## Generer la Javadoc
+
+Depuis `PipBoysQuest/` :
+
+```zsh
 javadoc -d docs/javadoc -sourcepath src -subpackages serenadebird.pipboysquest -encoding UTF-8
 ```
+
+Puis ouvrir `PipBoysQuest/docs/javadoc/index.html` dans un navigateur.
