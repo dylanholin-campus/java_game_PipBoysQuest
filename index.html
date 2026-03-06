@@ -156,13 +156,13 @@
                                 <p><span class="visibility">- </span>menu: Menu</p>
                                 <p><span class="visibility">- </span>player: Character</p>
                                 <p><span class="visibility">- </span>isOver: boolean</p>
+                                <p><span class="visibility">- </span>db: DatabaseManager</p>
                             </div>
                             <div class="uml-section uml-methods">
-                                <p><span class="visibility">+ </span>Game(gameMenu: Menu)</p>
+                                <p><span class="visibility">+ </span>Game(gameMenu: Menu, dbManager: DatabaseManager)</p>
                                 <p><span class="visibility">+ </span>start(): void</p>
                                 <p><span class="visibility">+ </span>playTurn(): void</p>
-                                <p><span class="visibility">+ </span>movePlayer(steps: int): void throws OutOfBoardException
-                                </p>
+                                <p><span class="visibility">+ </span>movePlayer(steps: int): void throws OutOfBoardException</p>
                                 <p><span class="visibility">+ </span>toString(): String</p>
                             </div>
                         </div>
@@ -193,11 +193,16 @@
                             <div class="uml-section uml-attributes">
                                 <p><span class="visibility">- </span>size: int = 64</p>
                                 <p><span class="visibility">- </span>cells: ArrayList&lt;Cell&gt;</p>
+                                <p><span class="visibility">- </span>db: DatabaseManager</p>
+                                <p><span class="visibility">- </span>random: Random</p>
                             </div>
                             <div class="uml-section uml-methods">
                                 <p><span class="visibility">+ </span>Board()</p>
+                                <p><span class="visibility">+ </span>Board(size: int)</p>
+                                <p><span class="visibility">+ </span>Board(size: int, db: DatabaseManager)</p>
                                 <p><span class="visibility">+ </span>getStartPosition(): int</p>
                                 <p><span class="visibility">+ </span>checkCell(position: int): void</p>
+                                <p><span class="visibility">+ </span>interactAt(position: int, character: Character): void</p>
                                 <p><span class="visibility">+ </span>isInside(position: int): boolean</p>
                                 <p><span class="visibility">+ </span>getSize(): int</p>
                                 <p><span class="visibility">+ </span>getCells(): ArrayList&lt;Cell&gt;</p>
@@ -205,7 +210,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="association">Board contient une liste de Cell</div>
+                    <div class="association">Board contient une liste de Cell et genere les cases speciales aleatoirement</div>
                 </div>
 
                 <div class="package">
@@ -223,6 +228,7 @@
                                 <p><span class="visibility">+ </span>Cell(position: int)</p>
                                 <p><span class="visibility">+ </span>getPosition(): int</p>
                                 <p><span class="visibility">+ </span>toString(): String {abstract}</p>
+                                <p><span class="visibility">+ </span>interact(character: Character): void {abstract}</p>
                             </div>
                         </div>
 
@@ -231,6 +237,7 @@
                             <div class="uml-section uml-methods">
                                 <p><span class="visibility">+ </span>EmptyCell(position: int)</p>
                                 <p><span class="visibility">+ </span>toString(): String</p>
+                                <p><span class="visibility">+ </span>interact(character: Character): void</p>
                             </div>
                         </div>
 
@@ -238,10 +245,14 @@
                             <div class="uml-header">EnemyCell</div>
                             <div class="uml-section uml-attributes">
                                 <p><span class="visibility">- </span>enemyName: String</p>
+                                <p><span class="visibility">- </span>enemy: Enemy</p>
+                                <p><span class="visibility">- </span>encounterDone: boolean</p>
                             </div>
                             <div class="uml-section uml-methods">
                                 <p><span class="visibility">+ </span>EnemyCell(position: int, name: String)</p>
+                                <p><span class="visibility">+ </span>EnemyCell(position: int, enemy: Enemy)</p>
                                 <p><span class="visibility">+ </span>toString(): String</p>
+                                <p><span class="visibility">+ </span>interact(character: Character): void</p>
                             </div>
                         </div>
 
@@ -251,10 +262,15 @@
                                 <p><span class="visibility">- </span>itemType: String</p>
                                 <p><span class="visibility">- </span>itemName: String</p>
                                 <p><span class="visibility">- </span>itemValue: int</p>
+                                <p><span class="visibility">- </span>item: Object</p>
+                                <p><span class="visibility">- </span>looted: boolean</p>
                             </div>
                             <div class="uml-section uml-methods">
                                 <p><span class="visibility">+ </span>ItemsCell(pos: int, type: String, name: String, val: int)</p>
+                                <p><span class="visibility">+ </span>ItemsCell(pos: int, item: OffensiveEquipment)</p>
+                                <p><span class="visibility">+ </span>ItemsCell(pos: int, item: DefensiveEquipment)</p>
                                 <p><span class="visibility">+ </span>toString(): String</p>
+                                <p><span class="visibility">+ </span>interact(character: Character): void</p>
                             </div>
                         </div>
                     </div>
@@ -277,6 +293,7 @@
                                 <p><span class="visibility">- </span>offensiveEquipment: OffensiveEquipment</p>
                                 <p><span class="visibility">- </span>defensiveEquipment: DefensiveEquipment</p>
                                 <p><span class="visibility">- </span>boardPosition: int</p>
+                                <p><span class="visibility">- </span>id: int</p>
                             </div>
                             <div class="uml-section uml-methods">
                                 <p><span class="visibility">+ </span>Character()</p>
@@ -284,7 +301,8 @@
                                 <p><span class="visibility">+ </span>getSpecialAction(): String {abstract}</p>
                                 <p><span class="visibility">+ </span>move(steps: int): void</p>
                                 <p><span class="visibility">+ </span>takeDamage(amount: int): void</p>
-                                <p><span class="visibility">+ </span>isAlive(): boolean</p>
+                                <p><span class="visibility">+ </span>increaseHealthWithCap(amount: int): void</p>
+                                <p><span class="visibility">+ </span>increaseAttackWithCap(amount: int): void</p>
                                 <p><span class="visibility">+ </span>toString(): String</p>
                             </div>
                         </div>
@@ -411,6 +429,23 @@
                         </div>
                     </div>
                     <div class="association">Exception levee par Game.movePlayer(...) et captee dans Game.playTurn()</div>
+                </div>
+
+                <div class="package">
+                    <div class="package-header">package serenadebird.pipboysquest.db</div>
+                    <div class="class-grid">
+                        <div class="uml-class">
+                            <div class="uml-header">DatabaseManager</div>
+                            <div class="uml-section uml-methods">
+                                <p><span class="visibility">+ </span>seedCatalogsIfEmpty(): void</p>
+                                <p><span class="visibility">+ </span>replaceBoardLayout(layout: Map&lt;Integer, String&gt;): void</p>
+                                <p><span class="visibility">+ </span>getBoardLayoutCodes(): Map&lt;Integer, String&gt;</p>
+                                <p><span class="visibility">+ </span>createHero(character: Character): void</p>
+                                <p><span class="visibility">+ </span>editHero(character: Character): void</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="association">Persistante des personnages, catalogues Fallout et layout aleatoire du plateau</div>
                 </div>
 
                 <div class="mt-5 p-3 bg-light rounded">

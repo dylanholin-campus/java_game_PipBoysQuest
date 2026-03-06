@@ -2,8 +2,8 @@ package serenadebird.pipboysquest.game;
 
 import serenadebird.pipboysquest.board.Board;
 import serenadebird.pipboysquest.character.Character;
-import serenadebird.pipboysquest.exception.OutOfBoardException;
 import serenadebird.pipboysquest.db.DatabaseManager;
+import serenadebird.pipboysquest.exception.OutOfBoardException;
 
 public class Game {
     private Board board;
@@ -11,15 +11,14 @@ public class Game {
     private Menu menu;
     private Character player;
     private boolean isOver = false;
-
     private DatabaseManager db;
 
     public Game(Menu gameMenu, DatabaseManager dbManager) {
         this.menu = gameMenu;
         this.db = dbManager;
 
-        // Version simplifiee demandee par la consigne de diversification.
-        this.board = new Board(10);
+        // Plateau complet 64 cases (chargement BDD si disponible, sinon fallback Java).
+        this.board = new Board(64, db);
     }
 
     public void start() {
@@ -64,6 +63,11 @@ public class Game {
     private boolean playGame() {
         isOver = false;
         player.setBoardPosition(board.getStartPosition());
+
+        // La case 1 peut contenir un loot dans la nouvelle configuration.
+        board.checkCell(player.getBoardPosition());
+        board.interactAt(player.getBoardPosition(), player);
+        db.editHero(player);
 
         // Verification explicite des toString() des cases du plateau.
         board.printCellsOverview();
@@ -120,10 +124,10 @@ public class Game {
 
         System.out.println("Avancement: case " + player.getBoardPosition() + "/" + board.getSize());
         board.checkCell(player.getBoardPosition());
+        board.interactAt(player.getBoardPosition(), player);
 
-        player.takeDamage(1);
-        System.out.println("Le voyage vous fatigue... (-1 PV)");
-        db.changeLifePoints(player);
+        // Persiste les changements de stats/equipements apres interaction de case.
+        db.editHero(player);
 
         if (player.getBoardPosition() >= board.getSize()) {
             System.out.println("Arrivee atteinte !");

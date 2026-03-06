@@ -89,3 +89,35 @@ Syntaxes utilisees dans mon projet
 - `@throws TypeException` : documente les cas d'erreur leves par la methode.
 - `@Override` + Javadoc : utile pour preciser la version specialisee d'une methode heritee.
 - Generation : `javadoc -d docs/javadoc -sourcepath src -subpackages serenadebird.pipboysquest`.
+
+## Cases aleatoires et gestion du plateau
+
+- `Random` : classe Java qui produit des valeurs pseudo-aleatoires. Ici elle sert a melanger les positions des cases speciales.
+- `Collections.shuffle(liste, random)` : melange une liste en place. Utilise pour randomiser les types de cases et les positions.
+- `List<Integer>` : liste de positions candidates (1..64) avant attribution des ennemis/loots.
+- `Map<Integer, String>` : associe une position a un code de case (ex. `17 -> ITEM_LIGHTNING`).
+- `HashMap` : implementation rapide d'une map (utilisee pour stocker le layout genere).
+- `LinkedHashMap` : map qui conserve l'ordre d'insertion (utile pour lire un layout ordonne depuis la BDD).
+- `for (int i = 0; i < n; i++)` : boucle indexee utile pour associer 1 type de case a 1 position melangee.
+
+## Interaction personnage/case
+
+- `interact(Character character)` : methode polymorphe definie dans `Cell` et specialisee dans `EmptyCell`, `EnemyCell`, `ItemsCell`.
+- `instanceof` : verifie le type runtime d'un objet (ex. `character instanceof Warrior`).
+- Polymorphisme : `Board` appelle `cell.interact(player)` sans connaitre a l'avance le type concret de la case.
+- Etat de consommation : booléens comme `looted` ou `encounterDone` pour eviter de rejouer le meme evenement a chaque passage.
+
+## Regles metier (Warrior / Wizard)
+
+- Restriction d'equipement :
+  - `Warrior` accepte les `Weapon` mais refuse les `Spell`.
+  - `Wizard` accepte les `Spell` mais refuse les `Weapon`.
+- Bonus plafonnes : les methodes `increaseHealthWithCap(...)` et `increaseAttackWithCap(...)` appliquent une limite max selon la classe.
+- Persistance apres interaction : `db.editHero(player)` enregistre en base les stats/equipements modifies.
+
+## BDD du plateau
+
+- `board_layout` : table qui stocke le layout courant du plateau (`Position`, `CellCode`).
+- `replaceBoardLayout(...)` : vide puis reinsere le layout aleatoire courant pour garder une trace de la partie.
+- `DELETE FROM table` : supprime toutes les lignes d'une table avant reinsertion propre.
+- `PreparedStatement` : requetes SQL parametrees pour eviter les erreurs de concat et fiabiliser les insertions.

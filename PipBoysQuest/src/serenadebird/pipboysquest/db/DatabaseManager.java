@@ -1,11 +1,14 @@
 package serenadebird.pipboysquest.db;
 
 import serenadebird.pipboysquest.character.Character;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DatabaseManager {
     private String url;
@@ -62,12 +65,14 @@ public class DatabaseManager {
             return;
         }
         try {
-            String sql = "INSERT INTO `character` (Type, Name, LifePoints, Strength) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO `character` (Type, Name, LifePoints, Strength, OffensiveEquipment, DefensiveEquipment) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, c.getType());
             pstmt.setString(2, c.getName());
             pstmt.setInt(3, c.getHealthLevel());
             pstmt.setInt(4, c.getAttackStrength());
+            pstmt.setString(5, c.getOffensiveEquipment() != null ? c.getOffensiveEquipment().getName() : null);
+            pstmt.setString(6, c.getDefensiveEquipment() != null ? c.getDefensiveEquipment().getName() : null);
             pstmt.executeUpdate();
 
             // Récupérer l'ID généré par la BDD et le donner au personnage
@@ -88,13 +93,15 @@ public class DatabaseManager {
             return;
         }
         try {
-            String sql = "UPDATE `character` SET Type = ?, Name = ?, LifePoints = ?, Strength = ? WHERE Id = ?";
+            String sql = "UPDATE `character` SET Type = ?, Name = ?, LifePoints = ?, Strength = ?, OffensiveEquipment = ?, DefensiveEquipment = ? WHERE Id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, c.getType());
             pstmt.setString(2, c.getName());
             pstmt.setInt(3, c.getHealthLevel());
             pstmt.setInt(4, c.getAttackStrength());
-            pstmt.setInt(5, c.getId());
+            pstmt.setString(5, c.getOffensiveEquipment() != null ? c.getOffensiveEquipment().getName() : null);
+            pstmt.setString(6, c.getDefensiveEquipment() != null ? c.getDefensiveEquipment().getName() : null);
+            pstmt.setInt(7, c.getId());
             pstmt.executeUpdate();
             System.out.println("Hero " + c.getName() + " mis a jour en BDD !");
         } catch (Exception error) {
@@ -207,6 +214,56 @@ public class DatabaseManager {
     }
 
     /**
+     * Charge le layout du plateau depuis la BDD.
+     */
+    public Map<Integer, String> getBoardLayoutCodes() {
+        Map<Integer, String> layout = new LinkedHashMap<>();
+        if (!hasConnection() || !tableExists("board_layout")) {
+            return layout;
+        }
+
+        String sql = "SELECT Position, CellCode FROM `board_layout` ORDER BY Position";
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                layout.put(rs.getInt("Position"), rs.getString("CellCode"));
+            }
+        } catch (Exception error) {
+            System.out.println("Erreur getBoardLayoutCodes : " + error.getMessage());
+        }
+        return layout;
+    }
+
+    /**
+     * Remplace le layout du plateau par le layout genere en memoire.
+     */
+    public void replaceBoardLayout(Map<Integer, String> layout) {
+        if (!hasConnection() || !tableExists("board_layout")) {
+            return;
+        }
+        if (layout == null || layout.isEmpty()) {
+            return;
+        }
+
+        try (Statement clearStmt = connection.createStatement()) {
+            clearStmt.executeUpdate("DELETE FROM `board_layout`");
+        } catch (Exception error) {
+            System.out.println("Erreur nettoyage board_layout : " + error.getMessage());
+            return;
+        }
+
+        String sql = "INSERT INTO `board_layout` (Position, CellCode) VALUES (?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            for (Map.Entry<Integer, String> entry : layout.entrySet()) {
+                pstmt.setInt(1, entry.getKey());
+                pstmt.setString(2, entry.getValue());
+                pstmt.executeUpdate();
+            }
+        } catch (Exception error) {
+            System.out.println("Erreur replaceBoardLayout : " + error.getMessage());
+        }
+    }
+
+    /**
      * Remplit les catalogues ennemis/objets uniquement s'ils sont vides.
      */
     public void seedCatalogsIfEmpty() {
@@ -214,19 +271,18 @@ public class DatabaseManager {
             return;
         }
         try {
-            boolean enemySeeded = false;
-            boolean itemSeeded = false;
+            boolean seededSomething = false;
 
-            if (isTableEmpty("enemy_catalog")) {
+            if (tableExists("enemy_catalog") && isTableEmpty("enemy_catalog")) {
                 seedEnemies();
-                enemySeeded = true;
+                seededSomething = true;
             }
-            if (isTableEmpty("item_catalog")) {
+            if (tableExists("item_catalog") && isTableEmpty("item_catalog")) {
                 seedItems();
-                itemSeeded = true;
+                seededSomething = true;
             }
 
-            if (enemySeeded || itemSeeded) {
+            if (seededSomething) {
                 System.out.println("Catalogue Fallout initialise.");
             }
         } catch (Exception error) {
@@ -235,8 +291,8 @@ public class DatabaseManager {
     }
 
     private boolean isTableEmpty(String tableName) throws Exception {
-        if (!"enemy_catalog".equals(tableName) && !"item_catalog".equals(tableName)) {
-            throw new IllegalArgumentException("Table non supportee : " + tableName);
+        if (!tableExists(tableName)) {
+            return false;
         }
 
         String sql = "SELECT COUNT(*) FROM `" + tableName + "`";
@@ -246,6 +302,18 @@ public class DatabaseManager {
             }
         }
         return true;
+    }
+
+    private boolean tableExists(String tableName) {
+        String sql = "SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, tableName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception error) {
+            return false;
+        }
     }
 
     private void seedEnemies() throws Exception {

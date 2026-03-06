@@ -190,4 +190,46 @@ public abstract class Character {
                 ", Equipement defensif : " + defensiveEquipment +
                 ", Position : " + boardPosition;
     }
+
+    /**
+     * Retourne la limite de points de vie selon la classe.
+     */
+    public int getMaxHealthLevel() {
+        if ("Warrior".equalsIgnoreCase(type)) {
+            return 150;
+        }
+        if ("Wizard".equalsIgnoreCase(type)) {
+            return 120;
+        }
+        return 120;
+    }
+
+    /**
+     * Retourne la limite de force selon la classe.
+     */
+    public int getMaxAttackStrength() {
+        if ("Warrior".equalsIgnoreCase(type)) {
+            return 20;
+        }
+        if ("Wizard".equalsIgnoreCase(type)) {
+            return 15;
+        }
+        return 15;
+    }
+
+    /**
+     * Augmente la vie sans depasser la limite de classe.
+     */
+    public void increaseHealthWithCap(int amount) {
+        int next = healthLevel + Math.max(0, amount);
+        healthLevel = Math.min(next, getMaxHealthLevel());
+    }
+
+    /**
+     * Augmente la force sans depasser la limite de classe.
+     */
+    public void increaseAttackWithCap(int amount) {
+        int next = attackStrength + Math.max(0, amount);
+        attackStrength = Math.min(next, getMaxAttackStrength());
+    }
 }

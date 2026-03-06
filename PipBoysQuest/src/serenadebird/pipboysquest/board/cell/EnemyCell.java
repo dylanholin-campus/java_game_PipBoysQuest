@@ -1,10 +1,12 @@
 package serenadebird.pipboysquest.board.cell;
 
+import serenadebird.pipboysquest.character.Character;
 import serenadebird.pipboysquest.enemy.Enemy;
 
 public class EnemyCell extends Cell {
     private String enemyName;
     private Enemy enemy;
+    private boolean encounterDone;
 
     public EnemyCell(int position, String enemyName) {
         super(position);
@@ -40,5 +42,18 @@ public class EnemyCell extends Cell {
             return "Case " + getPosition() + " : zone hostile - " + enemy;
         }
         return "Case " + getPosition() + " : ATTENTION ! environnement hostile" + " : ennemi (" + enemyName + ")";
+    }
+
+    @Override
+    public void interact(Character character) {
+        if (encounterDone) {
+            System.out.println("Cette zone hostile est deja neutralisee.");
+            return;
+        }
+
+        String enemyLabel = enemy != null ? enemy.toString() : enemyName;
+        System.out.println(character.getName() + " rencontre " + enemyLabel + " !");
+        System.out.println("Combat en approche (version simplifiee): interaction de combat a completer.");
+        encounterDone = true;
     }
 }

@@ -6,16 +6,17 @@ USE boutique;
 DROP TABLE IF EXISTS `character`;
 DROP TABLE IF EXISTS `enemy_catalog`;
 DROP TABLE IF EXISTS `item_catalog`;
+DROP TABLE IF EXISTS `board_layout`;
 
 -- Création de la table 'character' avec les bonnes colonnes
 CREATE TABLE `character` (
-                             Id INT AUTO_INCREMENT PRIMARY KEY,
-                             Type VARCHAR(50) NOT NULL,
-                             Name VARCHAR(100) NOT NULL,
-                             LifePoints INT NOT NULL DEFAULT 100,
-                             Strength INT NOT NULL DEFAULT 10,
-                             OffensiveEquipment VARCHAR(100),
-                             DefensiveEquipment VARCHAR(100)
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    Type VARCHAR(50) NOT NULL,
+    Name VARCHAR(100) NOT NULL,
+    LifePoints INT NOT NULL DEFAULT 100,
+    Strength INT NOT NULL DEFAULT 10,
+    OffensiveEquipment VARCHAR(100),
+    DefensiveEquipment VARCHAR(100)
 );
 
 -- Création de la table 'enemy_catalog' pour cataloguer les ennemis
@@ -35,6 +36,12 @@ CREATE TABLE `item_catalog` (
     Name VARCHAR(100) NOT NULL,
     ValueLevel INT NOT NULL,
     UniverseTag VARCHAR(50) NOT NULL DEFAULT 'Fallout'
+);
+
+-- Création de la table 'board_layout' pour représenter le plateau de jeu
+CREATE TABLE `board_layout` (
+    Position INT PRIMARY KEY,
+    CellCode VARCHAR(40) NOT NULL
 );
 
 -- Insertion de VOS données (Chevalier, Scribe, Raider)
@@ -57,3 +64,7 @@ VALUES
     ('OFFENSIVE', 'Fireball', 'Boule de feu plasma', 6),
     ('DEFENSIVE', 'StandardPotion', 'Potion standard', 2),
     ('DEFENSIVE', 'LargePotion', 'Grande potion', 5);
+
+-- Le layout du plateau est desormais aleatoire.
+-- La table `board_layout` est remplie au demarrage du jeu (generation Java),
+-- pour conserver une trace de la partie en cours.
