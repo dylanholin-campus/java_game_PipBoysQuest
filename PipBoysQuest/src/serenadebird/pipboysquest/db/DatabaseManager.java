@@ -1,6 +1,8 @@
 package serenadebird.pipboysquest.db;
 
 import serenadebird.pipboysquest.character.Character;
+import serenadebird.pipboysquest.character.Warrior;
+import serenadebird.pipboysquest.character.Wizard;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,6 +41,10 @@ public class DatabaseManager {
 
     private boolean hasConnection() {
         return connection != null;
+    }
+
+    public boolean isDatabaseAvailable() {
+        return hasConnection();
     }
 
     // 1. CONSIGNE : Créer la méthode getHeroes()
@@ -130,16 +136,15 @@ public class DatabaseManager {
     /**
      * Ajoute un ennemi dans la table enemy_catalog.
      */
-    public void createEnemy(String enemyType, String name, int dangerLevel) {
+    public void createEnemy(String enemyType, String name) {
         if (!hasConnection()) {
             System.out.println("createEnemy ignore: connexion absente.");
             return;
         }
-        String sql = "INSERT INTO `enemy_catalog` (EnemyType, Name, DangerLevel) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO `enemy_catalog` (EnemyType, Name) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, enemyType);
             pstmt.setString(2, name);
-            pstmt.setInt(3, dangerLevel);
             pstmt.executeUpdate();
             System.out.println("Ennemi ajoute: " + enemyType + " / " + name);
         } catch (Exception error) {
@@ -155,14 +160,13 @@ public class DatabaseManager {
             System.out.println("getEnemies ignore: connexion absente.");
             return;
         }
-        String sql = "SELECT Id, EnemyType, Name, DangerLevel FROM `enemy_catalog` ORDER BY Id";
+        String sql = "SELECT Id, EnemyType, Name FROM `enemy_catalog` ORDER BY Id";
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             System.out.println("\n=== ENNEMIS EN BDD ===");
             while (rs.next()) {
                 System.out.println("- ID: " + rs.getInt("Id")
                         + " | " + rs.getString("EnemyType")
-                        + " | " + rs.getString("Name")
-                        + " | danger +" + rs.getInt("DangerLevel"));
+                        + " | " + rs.getString("Name"));
             }
         } catch (Exception error) {
             System.out.println("Erreur getEnemies : " + error.getMessage());
@@ -317,21 +321,18 @@ public class DatabaseManager {
     }
 
     private void seedEnemies() throws Exception {
-        String sql = "INSERT INTO `enemy_catalog` (EnemyType, Name, DangerLevel) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO `enemy_catalog` (EnemyType, Name) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, "Dragon");
-            pstmt.setString(2, "Dragon irradie");
-            pstmt.setInt(3, 8);
+            pstmt.setString(2, "Dragon Ecorcheur");
             pstmt.executeUpdate();
 
             pstmt.setString(1, "Sorcerer");
             pstmt.setString(2, "Sorcier techno-raider");
-            pstmt.setInt(3, 6);
             pstmt.executeUpdate();
 
             pstmt.setString(1, "Goblin");
             pstmt.setString(2, "Gobelin feral");
-            pstmt.setInt(3, 4);
             pstmt.executeUpdate();
         }
     }
@@ -341,34 +342,44 @@ public class DatabaseManager {
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, "OFFENSIVE");
             pstmt.setString(2, "Mace");
-            pstmt.setString(3, "Massue rouillee");
-            pstmt.setInt(4, 3);
+            pstmt.setString(3, "Super Sledge");
+            pstmt.setInt(4, 7);
             pstmt.executeUpdate();
 
             pstmt.setString(2, "Sword");
-            pstmt.setString(3, "Epee de recuperation");
-            pstmt.setInt(4, 4);
-            pstmt.executeUpdate();
-
-            pstmt.setString(2, "Lightning");
-            pstmt.setString(3, "Eclair ionique");
+            pstmt.setString(3, "Ripper");
             pstmt.setInt(4, 5);
             pstmt.executeUpdate();
 
-            pstmt.setString(2, "Fireball");
-            pstmt.setString(3, "Boule de feu plasma");
+            pstmt.setString(2, "Lightning");
+            pstmt.setString(3, "Laser rifle AER9");
             pstmt.setInt(4, 6);
+            pstmt.executeUpdate();
+
+            pstmt.setString(2, "Fireball");
+            pstmt.setString(3, "Plasma caster");
+            pstmt.setInt(4, 8);
+            pstmt.executeUpdate();
+
+            pstmt.setString(2, "GaussRifle");
+            pstmt.setString(3, "Gauss rifle");
+            pstmt.setInt(4, 10);
+            pstmt.executeUpdate();
+
+            pstmt.setString(2, "AlienBlaster");
+            pstmt.setString(3, "Alien blaster");
+            pstmt.setInt(4, 9);
             pstmt.executeUpdate();
 
             pstmt.setString(1, "DEFENSIVE");
             pstmt.setString(2, "StandardPotion");
-            pstmt.setString(3, "Potion standard");
-            pstmt.setInt(4, 2);
+            pstmt.setString(3, "Stimpack standard");
+            pstmt.setInt(4, 20);
             pstmt.executeUpdate();
 
             pstmt.setString(2, "LargePotion");
-            pstmt.setString(3, "Grande potion");
-            pstmt.setInt(4, 5);
+            pstmt.setString(3, "Stimpack renforce");
+            pstmt.setInt(4, 40);
             pstmt.executeUpdate();
         }
     }
@@ -380,6 +391,61 @@ public class DatabaseManager {
             }
         } catch (Exception error) {
             System.out.println("Erreur fermeture connexion : " + error.getMessage());
+        }
+    }
+
+    public boolean hasHeroes() {
+        if (!hasConnection()) {
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM `character`";
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception error) {
+            System.out.println("Erreur hasHeroes : " + error.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Charge un heros par son ID.
+     */
+    public Character loadHeroById(int heroId) {
+        if (!hasConnection()) {
+            System.out.println("loadHeroById ignore: connexion absente.");
+            return null;
+        }
+
+        String sql = "SELECT Id, Type, Name, LifePoints, Strength FROM `character` WHERE Id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, heroId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+
+                String type = rs.getString("Type");
+                String name = rs.getString("Name");
+                Character hero;
+
+                if ("Warrior".equalsIgnoreCase(type)) {
+                    hero = new Warrior(name);
+                } else if ("Wizard".equalsIgnoreCase(type)) {
+                    hero = new Wizard(name);
+                } else {
+                    return null;
+                }
+
+                hero.setId(rs.getInt("Id"));
+                hero.setHealthLevel(rs.getInt("LifePoints"));
+                hero.setAttackStrength(rs.getInt("Strength"));
+                return hero;
+            }
+        } catch (Exception error) {
+            System.out.println("Erreur loadHeroById : " + error.getMessage());
+            return null;
         }
     }
 }

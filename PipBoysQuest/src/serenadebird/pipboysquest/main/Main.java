@@ -8,25 +8,21 @@ public class Main {
     public Main() {}
 
     public static void main(String[] args) {
-        // 1. Initialisation de la BDD
+        GameWindow.startAndHookConsole();
+
         DatabaseManager db = new DatabaseManager();
+        boolean databaseAvailable = db.isDatabaseAvailable();
+        if (databaseAvailable) {
+            System.out.println("Mode en ligne: MySQL detecte, sauvegarde active.");
+            db.seedCatalogsIfEmpty();
+            db.getHeroes();
+        } else {
+            System.out.println("Mode hors-ligne: MySQL indisponible, la sauvegarde est desactivee.");
+        }
 
-        // Seed transparent: ajoute les catalogues seulement si les tables sont vides.
-        db.seedCatalogsIfEmpty();
-
-        // 2. Affichage des héros existants (Consigne : au démarrage du jeu)
-        db.getHeroes();
-        System.out.println("--------------------------------\n");
-
-        // 3. Lancement du jeu
         Menu menu = new Menu();
-
-        // On passe 'db' au Game pour qu'il puisse sauvegarder pendant la partie
         Game game = new Game(menu, db);
-
         game.start();
-
-        // 4. Fermeture propre quand on quitte le jeu
         db.fermerConnexion();
     }
 }
