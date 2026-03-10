@@ -1,54 +1,106 @@
 # PipBoysQuest
 
-Jeu d'aventure en Java inspire de Donjons & Dragons, adapte a l'univers Fallout.
-Le joueur cree son personnage, explore un plateau et progresse avec sauvegarde en base MySQL.
+> **Journal du Pip-Boy:** les Terres Desolees n'attendent personne.
 
-## Fonctionnalites
+Jeu d'aventure tour par tour en Java, dans une ambiance Fallout: exploration, rencontres hostiles, loot, choix tactiques et progression de personnage.
 
-- Ambiance Fallout (Confrerie, Terres desolees, loots, zones hostiles).
-- Creation de personnage (Warrior/Wizard) et gestion via menu console.
-- Plateau de jeu avec cases speciales (ennemis, objets, cases vides).
-- Sauvegarde des heros et de leur progression en base MySQL.
-- Catalogues BDD dedies pour ennemis et objets (`enemy_catalog`, `item_catalog`).
+---
 
-## Prerequis
+## Sommaire
 
-- Java JDK 17+
-- MySQL (local)
-- Adminer (recommande) ou autre client SQL
+- [Apercu](#apercu)
+- [Classes jouables](#classes-jouables)
+- [Demarrage rapide](#demarrage-rapide-joueur)
+- [Build distribution (pour partager le jeu)](#build-distribution-pour-partager-le-jeu)
+- [Mode developpeur](#mode-developpeur)
+- [Structure du package dist](#structure-du-package-dist)
+- [Documentation](#documentation)
 
-## Documentation
+---
 
-- Schema UML : https://dylanholin-campus.github.io/java_game_PipBoysQuest/
-- Javadoc locale : `PipBoysQuest/docs/javadoc/index.html`
+## Apercu
 
-## Installation (utilisateur)
+Dans `PipBoysQuest`, vous incarnez un survivant et avancez case par case sur un plateau dangereux.
 
-### 1) Recuperer le projet
+- Exploration de zones hostiles
+- Combats
+- Loot d'equipements offensifs/defensifs
+- Interface texte avec fenetre Swing style pip-boy
+- Sauvegarde MySQL quand la base est disponible
 
-```zsh
-git clone <url-du-repo>
-cd java_game_PipBoysQuest
+Si MySQL est indisponible, le jeu demarre en mode hors-ligne (sans sauvegarde/chargement BDD).
+
+---
+
+## Classes jouables
+
+Pour le joueur, les archetypes sont:
+
+- **Chevalier de l'Acier** (profil combat)
+- **Scribe** (profil technique/energie)
+
+
+---
+
+## Demarrage rapide
+
+Vous pouvez jouer à PipBoysQuest sans compiler le projet.
+
+### Prerequis minimum
+
+- Java 17+
+- MySQL optionnel
+
+### Ubuntu / Linux
+
+```bash
+unzip PipBoysQuest-dist.zip
+cd dist
+./run.sh
+# si besoin:
+bash run.sh
 ```
 
-### 2) Initialiser la base MySQL avec Adminer
+### Windows
 
-- Ouvrir Adminer et se connecter a votre serveur MySQL
-- Executer le script `init_db.sql` a la racine du projet
-- Le script cree (ou recree) la base `boutique` et les tables :
-  - `character`
-  - `enemy_catalog`
-  - `item_catalog`
+```bat
+extraire le zip puis double cliquer sur run.bat
+```
 
-### 3) Configurer les identifiants BDD (sans modifier le code)
+---
 
-Le projet lit ces variables d'environnement :
+## Build distribution (pour partager le jeu)
 
-- `DB_URL`
-- `DB_USER`
-- `DB_PASSWORD`
+Depuis la racine du repo:
 
-Exemple (session terminal Linux/macOS) :
+### Linux / macOS
+
+```zsh
+cd PipBoysQuest
+chmod +x scripts/build.sh scripts/run.sh
+./scripts/build.sh
+```
+
+### Windows
+
+```bat
+cd PipBoysQuest
+scripts\build.bat
+```
+
+Le build genere `PipBoysQuest/dist/`, pret a zipper et partager.
+
+---
+
+## Mode developpeur
+
+### Prerequis
+
+- Java JDK 17+
+- MySQL local optionnel (utile pour sauvegarde/chargement)
+- Adminer ou autre client SQL (optionnel)
+
+### Variables d'environnement BDD (optionnel)
 
 ```zsh
 export DB_URL='jdbc:mysql://localhost:3306/boutique?useSSL=false&serverTimezone=UTC'
@@ -56,11 +108,14 @@ export DB_USER='root'
 export DB_PASSWORD='votre_mot_de_passe'
 ```
 
-> Si ces variables ne sont pas definies, le code utilise les valeurs de dev (`dev`/`dev`).
+Si ces variables sont absentes, des valeurs par defaut sont utilisees.
+Si la connexion echoue, le jeu demarre en hors-ligne.
 
-### 4) Compiler et lancer
+### Initialiser la base (si vous voulez la sauvegarde)
 
-Depuis le dossier `PipBoysQuest/` :
+- Executer `init_db.sql` a la racine du projet.
+
+### Compiler et lancer en mode source
 
 ```zsh
 cd PipBoysQuest
@@ -68,12 +123,28 @@ javac -cp .:../lib/mysql-connector.jar @sources.txt
 java -cp .:src:../lib/mysql-connector.jar serenadebird.pipboysquest.main.Main
 ```
 
-## Generer la Javadoc
+---
 
-Depuis `PipBoysQuest/` :
+## Structure du package dist
+
+Structure attendue:
+
+- `app/PipBoysQuest.jar`
+- `run.sh`
+- `run.bat`
+- `lib/mysql-connector.jar`
+- `image/`
+
+---
+
+## Documentation
+
+- Schema UML: https://dylanholin-campus.github.io/java_game_PipBoysQuest/
+- Javadoc locale: `PipBoysQuest/docs/javadoc/index.html`
+
+Generation Javadoc:
 
 ```zsh
+cd PipBoysQuest
 javadoc -d docs/javadoc -sourcepath src -subpackages serenadebird.pipboysquest -encoding UTF-8
 ```
-
-Puis ouvrir `PipBoysQuest/docs/javadoc/index.html` dans un navigateur.

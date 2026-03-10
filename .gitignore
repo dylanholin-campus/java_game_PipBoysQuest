@@ -11,6 +11,7 @@
 .mtj.tmp/
 
 # Package Files - Ne pas ignorer les JAR de lib necessaires (ex: driver JDBC)
+!lib/*.jar
 !PipBoysQuest/lib/*.jar
 *.jar
 *.war
@@ -35,6 +36,8 @@ replay_pid*
 /target/
 /build/
 /bin/
+/PipBoysQuest/build/
+/PipBoysQuest/dist/
 
 # Javadoc / Generated documentation
 # Decommenter si vous voulez ignorer la javadoc locale (mais utile pour l'hoster sur GitHub Pages)
