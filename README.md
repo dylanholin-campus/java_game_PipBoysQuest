@@ -1,5 +1,7 @@
 # PipBoysQuest
 
+<img width="1192" height="758" alt="image" src="https://github.com/user-attachments/assets/c8470763-0c4d-419b-8b1b-0d1096afb1c1" />
+
 > **Journal du Pip-Boy:** les Terres Desolees n'attendent personne.
 
 Jeu d'aventure tour par tour en Java, dans une ambiance Fallout: exploration, rencontres hostiles, loot, choix tactiques et progression de personnage.
