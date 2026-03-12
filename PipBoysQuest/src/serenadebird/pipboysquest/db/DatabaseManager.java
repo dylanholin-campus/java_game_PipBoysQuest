@@ -25,9 +25,8 @@ public class DatabaseManager {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(url, user, password);
-            System.out.println("Connexion BDD OK !");
         } catch (Exception e) {
-            System.out.println("Erreur connexion : " + e.getMessage());
+            // Mode hors-ligne: on reste silencieux pour ne pas polluer l'interface joueur.
         }
     }
 
@@ -50,7 +49,6 @@ public class DatabaseManager {
     // 1. CONSIGNE : Créer la méthode getHeroes()
     public void getHeroes() {
         if (!hasConnection()) {
-            System.out.println("getHeroes ignore: connexion absente.");
             return;
         }
         try (Statement stmt = connection.createStatement();
@@ -60,14 +58,13 @@ public class DatabaseManager {
                 System.out.println("- ID: " + rs.getInt("Id") + " | " + rs.getString("Type") + " : " + rs.getString("Name"));
             }
         } catch (Exception error) {
-            System.out.println("Erreur getHeroes : " + error.getMessage());
+            // Ignore les erreurs de listing en contexte joueur.
         }
     }
 
     // 2. CONSIGNE : Créer la méthode createHero(Character)
     public void createHero(Character c) {
         if (!hasConnection()) {
-            System.out.println("createHero ignore: connexion absente.");
             return;
         }
         try {
@@ -85,17 +82,15 @@ public class DatabaseManager {
             ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
                 c.setId(rs.getInt(1));
-                System.out.println("Hero " + c.getName() + " sauvegarde en BDD ! (ID: " + c.getId() + ")");
             }
         } catch (Exception error) {
-            System.out.println("Erreur createHero : " + error.getMessage());
+            // Ignore les erreurs de persistance en contexte joueur.
         }
     }
 
     // 3. CONSIGNE : Créer la méthode editHero(Character)
     public void editHero(Character c) {
         if (!hasConnection()) {
-            System.out.println("editHero ignore: connexion absente.");
             return;
         }
         try {
@@ -109,16 +104,14 @@ public class DatabaseManager {
             pstmt.setString(6, c.getDefensiveEquipment() != null ? c.getDefensiveEquipment().getName() : null);
             pstmt.setInt(7, c.getId());
             pstmt.executeUpdate();
-            System.out.println("Hero " + c.getName() + " mis a jour en BDD !");
         } catch (Exception error) {
-            System.out.println("Erreur editHero : " + error.getMessage());
+            // Ignore les erreurs de persistance en contexte joueur.
         }
     }
 
     // 4. CONSIGNE : Créer la méthode changeLifePoints(Character)
     public void changeLifePoints(Character c) {
         if (!hasConnection()) {
-            System.out.println("changeLifePoints ignore: connexion absente.");
             return;
         }
         try {
@@ -127,9 +120,8 @@ public class DatabaseManager {
             pstmt.setInt(1, c.getHealthLevel());
             pstmt.setInt(2, c.getId());
             pstmt.executeUpdate();
-            System.out.println("Points de vie de " + c.getName() + " mis a jour en BDD (" + c.getHealthLevel() + " PV).");
         } catch (Exception error) {
-            System.out.println("Erreur changeLifePoints : " + error.getMessage());
+            // Ignore les erreurs de persistance en contexte joueur.
         }
     }
 
@@ -287,10 +279,10 @@ public class DatabaseManager {
             }
 
             if (seededSomething) {
-                System.out.println("Catalogue Fallout initialise.");
+                // Seed effectue silencieusement pour garder une UX constante.
             }
         } catch (Exception error) {
-            System.out.println("Seed ignore : " + error.getMessage());
+            // Ignore les erreurs de seed en contexte joueur.
         }
     }
 

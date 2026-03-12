@@ -192,4 +192,16 @@ public class Menu {
         System.out.println("2. Quitter le jeu");
         return readIntInRange("Choix (1-2): ", 1, 2);
     }
+
+    /**
+     * Affiche les actions disponibles avant de jouer un tour.
+     *
+     * @return 1 pour lancer le de, 2 pour interrompre la partie en cours
+     */
+    public int showTurnMenu() {
+        System.out.println("\n--- Tour joueur ---");
+        System.out.println("1. Lancer le de");
+        System.out.println("2. Terminer la partie");
+        return readIntInRange("Choix (1-2): ", 1, 2);
+    }
 }

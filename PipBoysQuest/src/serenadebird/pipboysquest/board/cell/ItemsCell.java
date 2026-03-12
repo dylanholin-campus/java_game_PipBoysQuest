@@ -7,6 +7,7 @@ import serenadebird.pipboysquest.equipment.DefensiveEquipment;
 import serenadebird.pipboysquest.equipment.OffensiveEquipment;
 import serenadebird.pipboysquest.equipment.offensive.Spell;
 import serenadebird.pipboysquest.equipment.offensive.Weapon;
+import java.util.Scanner;
 
 public class ItemsCell extends Cell {
     private String itemType;
@@ -77,16 +78,28 @@ public class ItemsCell extends Cell {
         // Fallback legacy si la case a ete creee avec l'ancien constructeur String.
         System.out.println(character.getName() + " trouve " + itemName + ".");
         if ("POTION".equalsIgnoreCase(itemType)) {
+            if (!askYesNo("Voulez-vous utiliser " + itemName + " ? (o/n): ")) {
+                System.out.println(character.getName() + " n'utilise pas " + itemName + ".");
+                return;
+            }
             character.increaseHealthWithCap(itemValue);
             looted = true;
             return;
         }
         if ("WEAPON".equalsIgnoreCase(itemType) && character instanceof Warrior) {
+            if (!askYesNo("Voulez-vous equiper " + itemName + " ? (o/n): ")) {
+                System.out.println(character.getName() + " laisse " + itemName + " sur place.");
+                return;
+            }
             character.increaseAttackWithCap(itemValue);
             looted = true;
             return;
         }
         if ("SPELL".equalsIgnoreCase(itemType) && character instanceof Wizard) {
+            if (!askYesNo("Voulez-vous equiper " + itemName + " ? (o/n): ")) {
+                System.out.println(character.getName() + " laisse " + itemName + " sur place.");
+                return;
+            }
             character.increaseAttackWithCap(itemValue);
             looted = true;
             return;
@@ -103,6 +116,11 @@ public class ItemsCell extends Cell {
             return;
         }
 
+        if (!askYesNo("Voulez-vous equiper " + equipment.getName() + " ? (o/n): ")) {
+            System.out.println(character.getName() + " laisse " + equipment.getName() + " sur place.");
+            return;
+        }
+
         int oldAttack = character.getAttackStrength();
         character.setOffensiveEquipment(equipment);
         character.increaseAttackWithCap(equipment.getAttackLevel());
@@ -113,6 +131,11 @@ public class ItemsCell extends Cell {
     }
 
     private void handleDefensiveLoot(Character character, DefensiveEquipment equipment) {
+        if (!askYesNo("Voulez-vous utiliser " + equipment.getName() + " ? (o/n): ")) {
+            System.out.println(character.getName() + " n'utilise pas " + equipment.getName() + ".");
+            return;
+        }
+
         int oldHealth = character.getHealthLevel();
         character.setDefensiveEquipment(equipment);
         character.increaseHealthWithCap(equipment.getDefenseLevel());
@@ -120,5 +143,22 @@ public class ItemsCell extends Cell {
 
         System.out.println(character.getName() + " utilise " + equipment.getName() + ".");
         System.out.println("Vie: " + oldHealth + " -> " + character.getHealthLevel());
+    }
+
+    private boolean askYesNo(String prompt) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print(prompt);
+            String answer = scanner.nextLine().trim();
+            if ("o".equalsIgnoreCase(answer) || "oui".equalsIgnoreCase(answer)
+                    || "y".equalsIgnoreCase(answer) || "yes".equalsIgnoreCase(answer)) {
+                return true;
+            }
+            if ("n".equalsIgnoreCase(answer) || "non".equalsIgnoreCase(answer)
+                    || "no".equalsIgnoreCase(answer)) {
+                return false;
+            }
+            System.out.println("Reponse invalide. Tapez 'o' ou 'n'.");
+        }
     }
 }

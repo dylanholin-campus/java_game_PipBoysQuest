@@ -11,13 +11,8 @@ public class Main {
         GameWindow.startAndHookConsole();
 
         DatabaseManager db = new DatabaseManager();
-        boolean databaseAvailable = db.isDatabaseAvailable();
-        if (databaseAvailable) {
-            System.out.println("Mode en ligne: MySQL detecte, sauvegarde active.");
+        if (db.isDatabaseAvailable()) {
             db.seedCatalogsIfEmpty();
-            db.getHeroes();
-        } else {
-            System.out.println("Mode hors-ligne: MySQL indisponible, la sauvegarde est desactivee.");
         }
 
         Menu menu = new Menu();

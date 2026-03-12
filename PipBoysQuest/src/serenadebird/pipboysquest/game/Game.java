@@ -64,16 +64,15 @@ public class Game {
         isOver = false;
         player.setBoardPosition(board.getStartPosition());
 
-        // La case 1 peut contenir un loot dans la nouvelle configuration.
-        board.checkCell(player.getBoardPosition());
-        board.interactAt(player.getBoardPosition(), player);
-        db.editHero(player);
-
-        // Verification explicite des toString() des cases du plateau.
-        board.printCellsOverview();
 
         while (!isOver) {
-            playTurn();
+            int turnChoice = menu.showTurnMenu();
+            if (turnChoice == 1) {
+                playTurn();
+            } else {
+                System.out.println("Partie interrompue par le joueur.");
+                isOver = true;
+            }
         }
         int endChoice = menu.showEndMenu();
         return endChoice == 1;

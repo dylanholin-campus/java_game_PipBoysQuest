@@ -2,6 +2,7 @@ src/serenadebird/pipboysquest/game/Menu.java
 src/serenadebird/pipboysquest/game/Dice.java
 src/serenadebird/pipboysquest/game/Game.java
 src/serenadebird/pipboysquest/main/Main.java
+src/serenadebird/pipboysquest/main/GameWindow.java
 src/serenadebird/pipboysquest/board/Board.java
 src/serenadebird/pipboysquest/board/cell/Cell.java
 src/serenadebird/pipboysquest/board/cell/EmptyCell.java
