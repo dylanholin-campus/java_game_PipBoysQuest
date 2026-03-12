@@ -12,10 +12,9 @@ Jeu d'aventure tour par tour en Java, dans une ambiance Fallout: exploration, re
 
 - [Apercu](#apercu)
 - [Classes jouables](#classes-jouables)
-- [Demarrage rapide](#demarrage-rapide-joueur)
-- [Build distribution (pour partager le jeu)](#build-distribution-pour-partager-le-jeu)
-- [Mode developpeur](#mode-developpeur)
-- [Structure du package dist](#structure-du-package-dist)
+- [Guide joueur](#guide-joueur)
+- [Contenu du package dist](#contenu-du-package-dist)
+- [Guide developpeur](#guide-developpeur)
 - [Documentation](#documentation)
 
 ---
@@ -25,9 +24,9 @@ Jeu d'aventure tour par tour en Java, dans une ambiance Fallout: exploration, re
 Dans `PipBoysQuest`, vous incarnez un survivant et avancez case par case sur un plateau dangereux.
 
 - Exploration de zones hostiles
-- Combats
+- Combats tour par tour
 - Loot d'equipements offensifs/defensifs
-- Interface texte avec fenetre Swing style pip-boy
+- Interface texte avec fenetre Swing style Pip-Boy
 - Sauvegarde MySQL quand la base est disponible
 
 Si MySQL est indisponible, le jeu demarre en mode hors-ligne (sans sauvegarde/chargement BDD).
@@ -36,41 +35,50 @@ Si MySQL est indisponible, le jeu demarre en mode hors-ligne (sans sauvegarde/ch
 
 ## Classes jouables
 
-Pour le joueur, les archetypes sont:
-
 - **Chevalier de l'Acier** (profil combat)
 - **Scribe** (profil technique/energie)
 
-
 ---
 
-## Demarrage rapide
+## Guide joueur
 
-Vous pouvez jouer à PipBoysQuest sans compiler le projet.
+Vous pouvez jouer a `PipBoysQuest` sans compiler le projet.
 
-### Prerequis minimum
+### Prerequis
 
 - Java 17+
 - MySQL optionnel
 
-Sur Ubuntu, vous pouvez installer Java avec:
+#### Ubuntu / Linux
 
 ```bash
 sudo apt update
 sudo apt install openjdk-21-jdk
 ```
 
-### Ubuntu / Linux
+#### Windows (`run.bat`)
+
+- Java (JDK/JRE 17+) doit etre installe
+- Lien officiel Java: https://www.oracle.com/java/technologies/downloads/
+- Verifier dans un terminal: `java -version`
+
+### Lancement rapide
+
+1. Dezipper **completement** `PipBoysQuest-dist.zip`
+2. Aller dans le dossier extrait `dist/`
+3. Lancer le script correspondant a votre OS
+
+#### Ubuntu / Linux
 
 ```bash
 unzip PipBoysQuest-dist.zip
 cd dist
 ./run.sh
-# si besoin:
+# si besoin
 bash run.sh
 ```
 
-### Windows
+#### Windows
 
 ```bat
 extraire le zip puis double cliquer sur run.bat
@@ -78,19 +86,62 @@ extraire le zip puis double cliquer sur run.bat
 
 ---
 
-## Build distribution (pour partager le jeu)
+## Contenu du package dist
+
+Structure attendue apres extraction:
+
+- `app/PipBoysQuest.jar`
+- `run.sh`
+- `run.bat`
+- `lib/mysql-connector.jar`
+- `image/`
+
+---
+
+## Guide developpeur
+
+### Prerequis
+
+- Java JDK 17+
+- MySQL local optionnel (utile pour sauvegarde/chargement)
+- Client SQL type Adminer (optionnel)
+
+### Variables d'environnement BDD (optionnel)
+
+```bash
+export DB_URL='jdbc:mysql://localhost:3306/boutique?useSSL=false&serverTimezone=UTC'
+export DB_USER='root'
+export DB_PASSWORD='votre_mot_de_passe'
+```
+
+Si ces variables sont absentes, des valeurs par defaut sont utilisees.
+Si la connexion echoue, le jeu demarre en hors-ligne.
+
+### Initialiser la base (optionnel)
+
+Executer `init_db.sql` a la racine du projet.
+
+### Compiler et lancer depuis les sources
+
+```bash
+cd PipBoysQuest
+javac -cp .:../lib/mysql-connector.jar @sources.txt
+java -cp .:src:../lib/mysql-connector.jar serenadebird.pipboysquest.main.Main
+```
+
+### Generer un package dist
 
 Depuis la racine du repo:
 
-### Linux / macOS
+#### Linux / macOS
 
-```zsh
+```bash
 cd PipBoysQuest
 chmod +x scripts/build.sh scripts/run.sh
 ./scripts/build.sh
 ```
 
-### Windows
+#### Windows
 
 ```bat
 cd PipBoysQuest
@@ -101,59 +152,21 @@ Le build genere `PipBoysQuest/dist/`, pret a zipper et partager.
 
 ---
 
-## Mode developpeur
-
-### Prerequis
-
-- Java JDK 17+
-- MySQL local optionnel (utile pour sauvegarde/chargement)
-- Adminer ou autre client SQL (optionnel)
-
-### Variables d'environnement BDD (optionnel)
-
-```zsh
-export DB_URL='jdbc:mysql://localhost:3306/boutique?useSSL=false&serverTimezone=UTC'
-export DB_USER='root'
-export DB_PASSWORD='votre_mot_de_passe'
-```
-
-Si ces variables sont absentes, des valeurs par defaut sont utilisees.
-Si la connexion echoue, le jeu demarre en hors-ligne.
-
-### Initialiser la base (si vous voulez la sauvegarde)
-
-- Executer `init_db.sql` a la racine du projet.
-
-### Compiler et lancer en mode source
-
-```zsh
-cd PipBoysQuest
-javac -cp .:../lib/mysql-connector.jar @sources.txt
-java -cp .:src:../lib/mysql-connector.jar serenadebird.pipboysquest.main.Main
-```
-
----
-
-## Structure du package dist
-
-Structure attendue:
-
-- `app/PipBoysQuest.jar`
-- `run.sh`
-- `run.bat`
-- `lib/mysql-connector.jar`
-- `image/`
-
----
-
 ## Documentation
 
 - Schema UML: https://dylanholin-campus.github.io/java_game_PipBoysQuest/
 - Javadoc locale: `PipBoysQuest/docs/javadoc/index.html`
 
-Generation Javadoc:
+### Prerequis Javadoc (Ubuntu / Linux)
 
-```zsh
+```bash
+sudo apt update
+sudo apt install default-jdk
+```
+
+### Generation Javadoc
+
+```bash
 cd PipBoysQuest
 javadoc -d docs/javadoc -sourcepath src -subpackages serenadebird.pipboysquest -encoding UTF-8
 ```
