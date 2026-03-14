@@ -10,10 +10,14 @@ import java.util.Scanner;
  * Gere l'affichage console des menus et la lecture des saisies utilisateur.
  */
 public class Menu {
+    // Scanner unique pour toute la session afin d'eviter des lectures concurrentes sur System.in.
+    private final Scanner scanner = new Scanner(System.in);
+
     /**
      * Construit un menu base sur l'entree standard.
      */
     public Menu() {
+        // Aucune initialisation persistante: lecture basee sur System.in a la demande.
     }
 
     /**
@@ -22,9 +26,11 @@ public class Menu {
      * @return choix utilisateur entre 1 et 2
      */
     public int showMainMenu() {
+        // Entree principale du jeu.
         System.out.println("=== PIP-BOY'S QUEST ===");
         System.out.println("1. Nouveau personnage");
         System.out.println("2. Quitter le jeu");
+        // Valide strictement la plage autorisee.
         return readIntInRange("Choix (1-2): ", 1, 2);
     }
 
@@ -34,8 +40,10 @@ public class Menu {
      * @return personnage cree
      */
     public Character createCharacter() {
+        // Demande d'abord la classe puis le nom.
         int typeChoice = chooseCharacterType();
         String name = askCharacterName();
+        // Construit l'instance concrete correspondante.
         return buildCharacter(name, typeChoice);
     }
 
@@ -47,9 +55,11 @@ public class Menu {
      * @return instance concrete du personnage
      */
     public Character buildCharacter(String name, int typeChoice) {
+        // 1 => Warrior.
         if (typeChoice == 1) {
             return new Warrior(name);
         }
+        // 2 => Wizard (fallback puisque l'entree est deja validee).
         return new Wizard(name);
     }
 
@@ -59,6 +69,7 @@ public class Menu {
      * @return choix utilisateur entre 1 et 5
      */
     public int showCharacterMenu() {
+        // Menu de gestion avant de lancer une partie.
         System.out.println("\n--- Menu Personnage ---");
         System.out.println("1. Afficher les infos");
         System.out.println("2. Modifier les infos");
@@ -74,6 +85,7 @@ public class Menu {
      * @param character personnage a afficher
      */
     public void showCharacterInfo(Character character) {
+        // Delegue au toString du personnage pour garder un affichage centralise.
         System.out.println(character.toString());
     }
 
@@ -83,6 +95,7 @@ public class Menu {
      * @param message message de l'exception
      */
     public void showOutOfBoardMessage(String message) {
+        // Message contextualise pour les depassements de plateau.
         System.out.println("Depassement detecte: " + message);
     }
 
@@ -92,6 +105,7 @@ public class Menu {
      * @return choix utilisateur entre 1 et 3
      */
     public int showModifyMenu() {
+        // Sous-menu dedie aux changements de profil.
         System.out.println("\n--- Modifier ---");
         System.out.println("1. Changer le nom");
         System.out.println("2. Changer le type");
@@ -105,6 +119,7 @@ public class Menu {
      * @return nom valide
      */
     public String askCharacterName() {
+        // Reutilise le validateur de saisie non vide.
         return readNonEmpty("Nom du personnage: ");
     }
 
@@ -114,8 +129,9 @@ public class Menu {
      * @return 1 pour Warrior, 2 pour Wizard
      */
     public int chooseCharacterType() {
-        System.out.println("\n1. Warrior");
-        System.out.println("2. Wizard");
+        // Choix binaire entre les deux classes disponibles.
+        System.out.println("\n1. Chevalier");
+        System.out.println("2. Scribe");
         return readIntInRange("Choix (1-2): ", 1, 2);
     }
 
@@ -135,6 +151,7 @@ public class Menu {
      */
     @Override
     public String toString() {
+        // Classe stateless, representation minimale.
         return "Menu{}";
     }
 
@@ -147,18 +164,22 @@ public class Menu {
      * @return entier valide compris entre min et max
      */
     private int readIntInRange(String prompt, int min, int max) {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
+            // Affiche le prompt puis lit la ligne brute.
             System.out.print(prompt);
+            System.out.flush();
             String raw = scanner.nextLine();
             try {
+                // Conversion robuste avec trim des espaces.
                 int value = Integer.parseInt(raw.trim());
                 if (value >= min && value <= max) {
+                    // Retourne uniquement une valeur dans l'intervalle attendu.
                     return value;
                 }
             } catch (NumberFormatException ignored) {
                 // loop again
             }
+            // Feedback utilisateur en cas d'echec de validation.
             System.out.println("Choix invalide, recommencez.");
         }
     }
@@ -170,13 +191,16 @@ public class Menu {
      * @return texte valide non vide
      */
     private String readNonEmpty(String prompt) {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
+            // Affiche le prompt puis lit une saisie nettoyee.
             System.out.print(prompt);
+            System.out.flush();
             String value = scanner.nextLine().trim();
             if (!value.isEmpty()) {
+                // Retourne la premiere saisie non vide.
                 return value;
             }
+            // Informe l'utilisateur et relance la boucle.
             System.out.println("Saisie vide, recommencez.");
         }
     }
@@ -187,8 +211,9 @@ public class Menu {
      * @return 1 pour recommencer, 2 pour quitter
      */
     public int showEndMenu() {
+        // Menu affiche a la fin d'une partie.
         System.out.println("\n--- Fin de partie ---");
-        System.out.println("1. Recommencer une partie");
+        System.out.println("1. Retour au Menu Personnage");
         System.out.println("2. Quitter le jeu");
         return readIntInRange("Choix (1-2): ", 1, 2);
     }
@@ -199,9 +224,49 @@ public class Menu {
      * @return 1 pour lancer le de, 2 pour interrompre la partie en cours
      */
     public int showTurnMenu() {
-        System.out.println("\n--- Tour joueur ---");
-        System.out.println("1. Lancer le de");
+        // Menu d'action a chaque tour de jeu.
+        System.out.println("Appuyez sur 1 pour faire un lancer");
         System.out.println("2. Terminer la partie");
-        return readIntInRange("Choix (1-2): ", 1, 2);
+        return readIntInRange("Action (1-2): ", 1, 2);
+    }
+
+    /**
+     * Affiche les options disponibles pendant un combat.
+     *
+     * @param fleeChance pourcentage de chance de fuite affiche au joueur
+     * @return 1 pour attaquer, 2 pour tenter de fuir
+     */
+    public int showCombatMenu(int fleeChance) {
+        // Reproduit le prompt de combat court attendu dans l'UI Pip-Boy.
+        System.out.println("1) Attaquer");
+        System.out.println("2) Tenter de fuir (" + fleeChance + "% de chance)");
+        return readIntInRange("Action (1-2): ", 1, 2);
+    }
+
+    /**
+     * Lit une confirmation oui/non de facon robuste.
+     *
+     * @param prompt question affichee a l'utilisateur
+     * @return true si l'utilisateur confirme, sinon false
+     */
+    public boolean askYesNo(String prompt) {
+        while (true) {
+            // Affiche la question puis lit la reponse brute.
+            System.out.print(prompt);
+            System.out.flush();
+            String answer = scanner.nextLine().trim();
+            // Accepte plusieurs variantes de confirmation.
+            if ("o".equalsIgnoreCase(answer) || "oui".equalsIgnoreCase(answer)
+                    || "y".equalsIgnoreCase(answer) || "yes".equalsIgnoreCase(answer)) {
+                return true;
+            }
+            // Accepte plusieurs variantes de refus.
+            if ("n".equalsIgnoreCase(answer) || "non".equalsIgnoreCase(answer)
+                    || "no".equalsIgnoreCase(answer)) {
+                return false;
+            }
+            // Boucle jusqu'a obtenir une reponse conforme.
+            System.out.println("Reponse invalide. Tapez 'o' ou 'n'.");
+        }
     }
 }

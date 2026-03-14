@@ -1,7 +1,7 @@
 package serenadebird.pipboysquest.character;
 
 import serenadebird.pipboysquest.equipment.defensive.Potion;
-import serenadebird.pipboysquest.equipment.offensive.Spell;
+import serenadebird.pipboysquest.equipment.offensive.Weapon;
 
 /**
  * Specialisation de Character pour un personnage oriente magie.
@@ -13,11 +13,15 @@ public class Wizard extends Character {
      * @param name nom du personnage
      */
     public Wizard(String name) {
+        // Definit le type metier et le nom.
         super("Wizard", name);
+        // Profil de base: un peu moins de vie, orientation attaques magiques.
         setHealthLevel(100);
         setAttackStrength(12);
-        setOffensiveEquipment(new Spell("Gamma Ray", 6));
-        setDefensiveEquipment(new Potion("Stimpak", 4));
+        // Equipement de depart offensif.
+        setOffensiveEquipment(new Weapon("Pistolet gamma", 5));
+        // Equipement de depart defensif.
+        setDefensiveEquipment(new Potion("Stimpack", 20));
     }
 
     /**
@@ -27,6 +31,7 @@ public class Wizard extends Character {
      */
     @Override
     public String getSpecialAction() {
+        // Action signature de la classe Wizard.
         return "Concentration arcanique";
     }
 
@@ -37,6 +42,7 @@ public class Wizard extends Character {
      */
     @Override
     public String toString() {
+        // Reutilise le resume parent puis ajoute la competence speciale.
         return super.toString() + ", Action speciale : " + getSpecialAction();
     }
 }

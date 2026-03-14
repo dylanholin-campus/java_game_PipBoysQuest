@@ -3,99 +3,155 @@ package serenadebird.pipboysquest.db;
 import serenadebird.pipboysquest.character.Character;
 import serenadebird.pipboysquest.character.Warrior;
 import serenadebird.pipboysquest.character.Wizard;
+import serenadebird.pipboysquest.equipment.defensive.PotionCatalog;
+import serenadebird.pipboysquest.equipment.offensive.WeaponCatalog;
 
+// Bibliothèque pour gérer la session de connexion avec la base de données.
 import java.sql.Connection;
+// Bibliothèque permettant de charger le pilote et d'établir la connexion SQL.
 import java.sql.DriverManager;
+// Bibliothèque pour préparer des requêtes SQL sécurisées avec des paramètres (évite les injections).
 import java.sql.PreparedStatement;
+// Bibliothèque pour stocker et parcourir les résultats d'une requête SELECT.
 import java.sql.ResultSet;
+// Bibliothèque pour exécuter des requêtes SQL simples et statiques.
 import java.sql.Statement;
+// Type de collection (dictionnaire) qui conserve l'ordre d'insertion des éléments.
 import java.util.LinkedHashMap;
+// Type d'interface pour les collections de type clé/valeur (Dictionnaire).
 import java.util.Map;
 
+/**
+ * Couche d'acces aux donnees du jeu.
+ *
+ * <p>La classe fonctionne en mode connecte quand MySQL est disponible,
+ * et degrade en mode hors-ligne quand la connexion ne peut pas etre etablie.</p>
+ */
 public class DatabaseManager {
+    // Adresse complète de connexion vers la base de données.
     private String url;
+    // Identifiant utilisé pour ouvrir la connexion.
     private String user;
+    // Mot de passe utilisé pour ouvrir la connexion.
     private String password;
+    // Objet JDBC central : toutes les requêtes partent de cette connexion.
     private Connection connection;
 
+    /**
+     * Initialise la connexion a partir des variables d'environnement,
+     * puis bascule silencieusement en hors-ligne en cas d'echec.
+     */
     public DatabaseManager() {
+        // Lecture des paramètres depuis l'environnement, avec valeurs de repli.
         this.url = envOrDefault("DB_URL", "jdbc:mysql://localhost:3306/boutique?useSSL=false&serverTimezone=UTC");
         this.user = envOrDefault("DB_USER", "dev");
         this.password = envOrDefault("DB_PASSWORD", "dev");
         try {
+            // Chargement explicite du pilote MySQL pour JDBC.
             Class.forName("com.mysql.cj.jdbc.Driver");
+            // Ouverture de la session SQL partagée par toutes les méthodes de cette classe.
             connection = DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
-            // Mode hors-ligne: on reste silencieux pour ne pas polluer l'interface joueur.
+            // Si la connexion échoue, le jeu continue en mode hors ligne.
         }
     }
 
+    /**
+     * Lit une variable d'environnement ou retourne une valeur par defaut.
+     */
     private String envOrDefault(String key, String fallback) {
+        // Lecture brute d'une variable d'environnement système.
         String value = System.getenv(key);
+        // Si elle est absente ou vide, on applique la valeur de repli.
         if (value == null || value.trim().isEmpty()) {
             return fallback;
         }
+        // Nettoyage des espaces inutiles avant utilisation.
         return value.trim();
     }
 
+    /**
+     * @return true si une connexion SQL est active
+     */
     private boolean hasConnection() {
+        // Vérification minimale : la connexion existe en mémoire.
         return connection != null;
     }
 
+    /**
+     * @return true si la base est joignable depuis cette instance
+     */
     public boolean isDatabaseAvailable() {
         return hasConnection();
     }
 
-    // 1. CONSIGNE : Créer la méthode getHeroes()
+    /**
+     * Affiche la liste des heros persistants.
+     */
     public void getHeroes() {
+        // Protection : aucune requête SQL si la base est indisponible.
         if (!hasConnection()) {
             return;
         }
+        // "try (...)" ferme automatiquement Statement et ResultSet en sortie de bloc.
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM `character`")) {
             System.out.println("\n=== HEROS DANS LA BDD ===");
+            // Parcours de toutes les lignes renvoyées par la requête SELECT.
             while (rs.next()) {
+                // Lecture colonne par colonne et affichage lisible dans la console.
                 System.out.println("- ID: " + rs.getInt("Id") + " | " + rs.getString("Type") + " : " + rs.getString("Name"));
             }
         } catch (Exception error) {
-            // Ignore les erreurs de listing en contexte joueur.
+            // En jeu, on évite d'interrompre la partie en cas d'erreur de lecture.
         }
     }
 
-    // 2. CONSIGNE : Créer la méthode createHero(Character)
+    /**
+     * Cree un hero en BDD et remonte son ID auto-genere dans l'objet metier.
+     */
     public void createHero(Character c) {
+        // Le paramètre c provient du domaine métier (Character, Warrior, Wizard).
         if (!hasConnection()) {
             return;
         }
         try {
+            // Requête d'insertion d'un nouveau héros dans la table character.
             String sql = "INSERT INTO `character` (Type, Name, LifePoints, Strength, OffensiveEquipment, DefensiveEquipment) VALUES (?, ?, ?, ?, ?, ?)";
+            // RETURN_GENERATED_KEYS permet de récupérer l'identifiant créé par la base.
             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            // Association des paramètres : chaque ? reçoit une valeur Java.
             pstmt.setString(1, c.getType());
             pstmt.setString(2, c.getName());
             pstmt.setInt(3, c.getHealthLevel());
             pstmt.setInt(4, c.getAttackStrength());
             pstmt.setString(5, c.getOffensiveEquipment() != null ? c.getOffensiveEquipment().getName() : null);
             pstmt.setString(6, c.getDefensiveEquipment() != null ? c.getDefensiveEquipment().getName() : null);
+            // Exécution réelle de l'insertion en base.
             pstmt.executeUpdate();
 
-            // Récupérer l'ID généré par la BDD et le donner au personnage
+            // Récupération de l'identifiant généré puis synchronisation de l'objet métier.
             ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
                 c.setId(rs.getInt(1));
             }
         } catch (Exception error) {
-            // Ignore les erreurs de persistance en contexte joueur.
+            // En cas d'erreur SQL, la session de jeu continue.
         }
     }
 
-    // 3. CONSIGNE : Créer la méthode editHero(Character)
+    /**
+     * Met a jour l'etat persiste d'un hero existant.
+     */
     public void editHero(Character c) {
+        // Mise à jour complète d'un héros déjà existant (même identifiant).
         if (!hasConnection()) {
             return;
         }
         try {
             String sql = "UPDATE `character` SET Type = ?, Name = ?, LifePoints = ?, Strength = ?, OffensiveEquipment = ?, DefensiveEquipment = ? WHERE Id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
+            // Les valeurs envoyées correspondent à l'état courant du personnage en mémoire.
             pstmt.setString(1, c.getType());
             pstmt.setString(2, c.getName());
             pstmt.setInt(3, c.getHealthLevel());
@@ -105,12 +161,15 @@ public class DatabaseManager {
             pstmt.setInt(7, c.getId());
             pstmt.executeUpdate();
         } catch (Exception error) {
-            // Ignore les erreurs de persistance en contexte joueur.
+            // En jeu, une erreur de sauvegarde ne doit pas bloquer l'utilisateur.
         }
     }
 
-    // 4. CONSIGNE : Créer la méthode changeLifePoints(Character)
+    /**
+     * Met a jour uniquement les points de vie d'un hero.
+     */
     public void changeLifePoints(Character c) {
+        // Variante ciblée : ne modifie qu'une seule colonne (LifePoints).
         if (!hasConnection()) {
             return;
         }
@@ -121,7 +180,7 @@ public class DatabaseManager {
             pstmt.setInt(2, c.getId());
             pstmt.executeUpdate();
         } catch (Exception error) {
-            // Ignore les erreurs de persistance en contexte joueur.
+            // Même stratégie de tolérance aux erreurs pendant la partie.
         }
     }
 
@@ -129,12 +188,14 @@ public class DatabaseManager {
      * Ajoute un ennemi dans la table enemy_catalog.
      */
     public void createEnemy(String enemyType, String name) {
+        // Méthode utilitaire de remplissage du catalogue des ennemis.
         if (!hasConnection()) {
             System.out.println("createEnemy ignore: connexion absente.");
             return;
         }
         String sql = "INSERT INTO `enemy_catalog` (EnemyType, Name) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            // Affectation des paramètres de la requête d'insertion.
             pstmt.setString(1, enemyType);
             pstmt.setString(2, name);
             pstmt.executeUpdate();
@@ -148,6 +209,7 @@ public class DatabaseManager {
      * Affiche les ennemis du catalogue.
      */
     public void getEnemies() {
+        // Affichage console du catalogue ennemi ordonné par identifiant.
         if (!hasConnection()) {
             System.out.println("getEnemies ignore: connexion absente.");
             return;
@@ -169,6 +231,7 @@ public class DatabaseManager {
      * Ajoute un objet dans la table item_catalog.
      */
     public void createItem(String itemClass, String itemType, String name, int valueLevel) {
+        // Insertion d'un objet de catalogue : arme ou protection.
         if (!hasConnection()) {
             System.out.println("createItem ignore: connexion absente.");
             return;
@@ -190,6 +253,7 @@ public class DatabaseManager {
      * Affiche les objets du catalogue.
      */
     public void getItems() {
+        // Lecture du catalogue des objets pour vérification et affichage.
         if (!hasConnection()) {
             System.out.println("getItems ignore: connexion absente.");
             return;
@@ -213,7 +277,9 @@ public class DatabaseManager {
      * Charge le layout du plateau depuis la BDD.
      */
     public Map<Integer, String> getBoardLayoutCodes() {
+        // LinkedHashMap conserve l'ordre d'insertion : utile pour un plateau séquentiel.
         Map<Integer, String> layout = new LinkedHashMap<>();
+        // On ne lit le plan du plateau que si la table existe réellement.
         if (!hasConnection() || !tableExists("board_layout")) {
             return layout;
         }
@@ -221,6 +287,7 @@ public class DatabaseManager {
         String sql = "SELECT Position, CellCode FROM `board_layout` ORDER BY Position";
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
+                // Clé = position de case ; valeur = code métier de la case.
                 layout.put(rs.getInt("Position"), rs.getString("CellCode"));
             }
         } catch (Exception error) {
@@ -233,6 +300,7 @@ public class DatabaseManager {
      * Remplace le layout du plateau par le layout genere en memoire.
      */
     public void replaceBoardLayout(Map<Integer, String> layout) {
+        // Cette méthode remplace entièrement la table board_layout par une nouvelle version.
         if (!hasConnection() || !tableExists("board_layout")) {
             return;
         }
@@ -241,6 +309,7 @@ public class DatabaseManager {
         }
 
         try (Statement clearStmt = connection.createStatement()) {
+            // Étape 1 : vider la table avant de réinsérer le nouveau plan.
             clearStmt.executeUpdate("DELETE FROM `board_layout`");
         } catch (Exception error) {
             System.out.println("Erreur nettoyage board_layout : " + error.getMessage());
@@ -249,6 +318,7 @@ public class DatabaseManager {
 
         String sql = "INSERT INTO `board_layout` (Position, CellCode) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            // Étape 2 : insertion case par case du plan généré en mémoire.
             for (Map.Entry<Integer, String> entry : layout.entrySet()) {
                 pstmt.setInt(1, entry.getKey());
                 pstmt.setString(2, entry.getValue());
@@ -263,6 +333,7 @@ public class DatabaseManager {
      * Remplit les catalogues ennemis/objets uniquement s'ils sont vides.
      */
     public void seedCatalogsIfEmpty() {
+        // Amorçage des catalogues uniquement lors d'une base vide.
         if (!hasConnection()) {
             return;
         }
@@ -279,14 +350,15 @@ public class DatabaseManager {
             }
 
             if (seededSomething) {
-                // Seed effectue silencieusement pour garder une UX constante.
+                // L'amorçage reste silencieux pour ne pas gêner l'expérience de jeu.
             }
         } catch (Exception error) {
-            // Ignore les erreurs de seed en contexte joueur.
+            // En cas d'échec d'amorçage, le jeu conserve un comportement tolérant.
         }
     }
 
     private boolean isTableEmpty(String tableName) throws Exception {
+        // Sécurité : si la table n'existe pas, on ne tente pas de lecture.
         if (!tableExists(tableName)) {
             return false;
         }
@@ -294,6 +366,7 @@ public class DatabaseManager {
         String sql = "SELECT COUNT(*) FROM `" + tableName + "`";
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
+                // COUNT(*) renvoie le nombre total de lignes de la table.
                 return rs.getInt(1) == 0;
             }
         }
@@ -301,6 +374,7 @@ public class DatabaseManager {
     }
 
     private boolean tableExists(String tableName) {
+        // Vérification d'existence via le dictionnaire système information_schema.
         String sql = "SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, tableName);
@@ -313,6 +387,7 @@ public class DatabaseManager {
     }
 
     private void seedEnemies() throws Exception {
+        // Amorçage d'exemples d'ennemis utilisés ensuite par le plateau.
         String sql = "INSERT INTO `enemy_catalog` (EnemyType, Name) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, "Dragon");
@@ -330,53 +405,36 @@ public class DatabaseManager {
     }
 
     private void seedItems() throws Exception {
+        // Ce contenu provient des catalogues Java WeaponCatalog et PotionCatalog.
         String sql = "INSERT INTO `item_catalog` (ItemClass, ItemType, Name, ValueLevel) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, "OFFENSIVE");
-            pstmt.setString(2, "Mace");
-            pstmt.setString(3, "Super Sledge");
-            pstmt.setInt(4, 7);
-            pstmt.executeUpdate();
-
-            pstmt.setString(2, "Sword");
-            pstmt.setString(3, "Ripper");
-            pstmt.setInt(4, 5);
-            pstmt.executeUpdate();
-
-            pstmt.setString(2, "Lightning");
-            pstmt.setString(3, "Laser rifle AER9");
-            pstmt.setInt(4, 6);
-            pstmt.executeUpdate();
-
-            pstmt.setString(2, "Fireball");
-            pstmt.setString(3, "Plasma caster");
-            pstmt.setInt(4, 8);
-            pstmt.executeUpdate();
-
-            pstmt.setString(2, "GaussRifle");
-            pstmt.setString(3, "Gauss rifle");
-            pstmt.setInt(4, 10);
-            pstmt.executeUpdate();
-
-            pstmt.setString(2, "AlienBlaster");
-            pstmt.setString(3, "Alien blaster");
-            pstmt.setInt(4, 9);
-            pstmt.executeUpdate();
+            pstmt.setString(2, "Weapon");
+            // Pour chaque entrée d'arme, on respecte la quantité définie dans le catalogue.
+            for (WeaponCatalog.Entry entry : WeaponCatalog.entries()) {
+                for (int i = 0; i < entry.getQuantity(); i++) {
+                    pstmt.setString(3, entry.getName());
+                    pstmt.setInt(4, entry.getAttack());
+                    pstmt.executeUpdate();
+                }
+            }
 
             pstmt.setString(1, "DEFENSIVE");
-            pstmt.setString(2, "StandardPotion");
-            pstmt.setString(3, "Stimpack standard");
-            pstmt.setInt(4, 20);
-            pstmt.executeUpdate();
-
-            pstmt.setString(2, "LargePotion");
-            pstmt.setString(3, "Stimpack renforce");
-            pstmt.setInt(4, 40);
-            pstmt.executeUpdate();
+            // Les protections utilisent la valeur de défense issue de PotionCatalog.
+            for (PotionCatalog.Entry entry : PotionCatalog.entries()) {
+                pstmt.setString(2, entry.getItemType());
+                pstmt.setString(3, entry.getName());
+                pstmt.setInt(4, entry.getDefense());
+                pstmt.executeUpdate();
+            }
         }
     }
 
+    /**
+     * Ferme la connexion SQL si elle est ouverte.
+     */
     public void fermerConnexion() {
+        // Fermeture explicite de la session SQL en fin d'application.
         try {
             if (connection != null) {
                 connection.close();
@@ -387,6 +445,7 @@ public class DatabaseManager {
     }
 
     public boolean hasHeroes() {
+        // Permet à l'interface de savoir si un chargement de héros est possible.
         if (!hasConnection()) {
             return false;
         }
@@ -405,6 +464,7 @@ public class DatabaseManager {
      * Charge un heros par son ID.
      */
     public Character loadHeroById(int heroId) {
+        // Lecture d'un héros en base puis reconstruction d'un objet métier Java.
         if (!hasConnection()) {
             System.out.println("loadHeroById ignore: connexion absente.");
             return null;
@@ -423,13 +483,17 @@ public class DatabaseManager {
                 Character hero;
 
                 if ("Warrior".equalsIgnoreCase(type)) {
+                    // Lien direct avec la classe Warrior du domaine personnage.
                     hero = new Warrior(name);
                 } else if ("Wizard".equalsIgnoreCase(type)) {
+                    // Lien direct avec la classe Wizard du domaine personnage.
                     hero = new Wizard(name);
                 } else {
+                    // Type inconnu : on refuse de construire un objet incohérent.
                     return null;
                 }
 
+                // Synchronisation des attributs persistés vers l'objet Java reconstruit.
                 hero.setId(rs.getInt("Id"));
                 hero.setHealthLevel(rs.getInt("LifePoints"));
                 hero.setAttackStrength(rs.getInt("Strength"));

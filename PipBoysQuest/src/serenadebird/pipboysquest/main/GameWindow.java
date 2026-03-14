@@ -60,6 +60,7 @@ public final class GameWindow { // Classe finale: non heritable.
     private final SimpleAttributeSet styleInput; // Commandes joueur.
     private final SimpleAttributeSet styleInfo; // Infos generales.
     private final SimpleAttributeSet styleMenu; // Titres/menu en cyan.
+    private final SimpleAttributeSet styleLoot; // Lignes de loot en ambre.
     private final SimpleAttributeSet styleError; // Erreurs en rouge vif.
 
     private final List<String> commandHistory; // Historique des commandes saisies.
@@ -106,27 +107,39 @@ public final class GameWindow { // Classe finale: non heritable.
 
         this.styleDefault = new SimpleAttributeSet();
         StyleConstants.setForeground(styleDefault, new Color(184, 255, 173));
+        StyleConstants.setBold(styleDefault, true);
 
         this.stylePv = new SimpleAttributeSet();
         StyleConstants.setForeground(stylePv, new Color(255, 110, 110));
+        StyleConstants.setBold(stylePv, true);
 
         this.styleDamage = new SimpleAttributeSet();
         StyleConstants.setForeground(styleDamage, new Color(255, 180, 90));
+        StyleConstants.setBold(styleDamage, true);
 
         this.styleSuccess = new SimpleAttributeSet();
         StyleConstants.setForeground(styleSuccess, new Color(140, 255, 140));
+        StyleConstants.setBold(styleSuccess, true);
 
         this.styleInput = new SimpleAttributeSet();
         StyleConstants.setForeground(styleInput, new Color(120, 210, 255));
+        StyleConstants.setBold(styleInput, true);
 
         this.styleInfo = new SimpleAttributeSet();
         StyleConstants.setForeground(styleInfo, new Color(210, 255, 180));
+        StyleConstants.setBold(styleInfo, true);
 
         this.styleMenu = new SimpleAttributeSet();
         StyleConstants.setForeground(styleMenu, new Color(130, 235, 255));
+        StyleConstants.setBold(styleMenu, true);
+
+        this.styleLoot = new SimpleAttributeSet();
+        StyleConstants.setForeground(styleLoot, new Color(255, 190, 95));
+        StyleConstants.setBold(styleLoot, true);
 
         this.styleError = new SimpleAttributeSet();
         StyleConstants.setForeground(styleError, new Color(255, 120, 120));
+        StyleConstants.setBold(styleError, true);
 
         JScrollPane scroll = new JScrollPane(logArea); // Place logArea dans scroll.
         scroll.setBorder(null); // Pas de bordure.
@@ -200,8 +213,8 @@ public final class GameWindow { // Classe finale: non heritable.
     public static void startAndHookConsole() {
         try {
             GameWindow window = new GameWindow();
-            window.logArea.setFont(new Font("Monospaced", Font.BOLD, 16)); // texte plus grand
-            window.inputField.setFont(new Font("Monospaced", Font.BOLD, 16));
+            window.logArea.setFont(new Font("Monospaced", Font.PLAIN, 15)); // format plus compact
+            window.inputField.setFont(new Font("Monospaced", Font.BOLD, 15));
             SwingUtilities.invokeLater(() -> {
                 window.frame.setVisible(true);
                 window.inputField.requestFocusInWindow();
@@ -384,6 +397,14 @@ public final class GameWindow { // Classe finale: non heritable.
         String lower = line.toLowerCase();
         if (lower.contains("victoire") || lower.contains("vaincu")) {
             setStatus("Combat termine: victoire.", new Color(140, 255, 140));
+        } else if (lower.contains("defaite") || lower.contains("tombe au combat")) {
+            setStatus("Combat termine: defaite.", new Color(255, 130, 130));
+        } else if (lower.contains("[loot]") || lower.contains("ramasser l'objet")) {
+            setStatus("Loot detecte: choisissez quoi faire.", new Color(255, 210, 120));
+        } else if (lower.contains("fuite reussie")) {
+            setStatus("Retraite validee.", new Color(140, 255, 140));
+        } else if (lower.contains("fuite ratee")) {
+            setStatus("Fuite ratee: combat en cours.", new Color(255, 180, 90));
         } else if (lower.contains("erreur")) {
             setStatus("Attention: une erreur est survenue.", new Color(255, 130, 130));
         } else if (lower.contains("tour") || lower.contains("choix") || lower.contains("action")) {
@@ -395,6 +416,16 @@ public final class GameWindow { // Classe finale: non heritable.
         String lower = line.toLowerCase();
         if (line.startsWith("> ")) {
             return styleInput;
+        }
+        if (lower.startsWith("choix") || lower.startsWith("nom du personnage")
+                || lower.contains("(o/n)") || lower.contains("(1-2)")
+                || lower.contains("(1-3)") || lower.contains("(1-5)")) {
+            return styleInfo;
+        }
+        if (lower.contains("[loot]") || lower.contains("vous trouvez") || lower.contains("gain potentiel")
+                || lower.contains("offensif actuel") || lower.contains("defensif actuel")
+                || lower.contains("ramasser l'objet")) {
+            return styleLoot;
         }
         if (line.startsWith("===") || line.startsWith("---") || lower.contains("menu")) {
             return styleMenu;
@@ -410,6 +441,9 @@ public final class GameWindow { // Classe finale: non heritable.
         }
         if (lower.contains("victoire") || lower.contains("vaincu") || lower.contains("esquive") || lower.contains("fuite reussie")) {
             return styleSuccess;
+        }
+        if (lower.contains("defaite") || lower.contains("fuite ratee") || lower.contains("dangereuse")) {
+            return styleError;
         }
         if (lower.contains("interface") || lower.contains("astuce") || lower.contains("objectif")) {
             return styleInfo;

@@ -6,14 +6,18 @@ import java.util.Random;
  * Modele un de virtuel configurable.
  */
 public class Dice {
+    // Borne minimale incluse.
     private int min = 1;
+    // Borne maximale incluse.
     private int max = 6;
+    // Generateur pseudo-aleatoire utilise pour les tirages.
     private Random random = new Random();
 
     /**
      * Construit un de standard (1-6).
      */
     public Dice() {
+        // Conserve les bornes par defaut 1..6.
     }
 
     /**
@@ -23,6 +27,7 @@ public class Dice {
      * @param max valeur maximale
      */
     public Dice(int min, int max) {
+        // Affecte les bornes personnalisees du de.
         this.min = min;
         this.max = max;
     }
@@ -33,6 +38,7 @@ public class Dice {
      * @return valeur aleatoire comprise entre min et max
      */
     public int roll() {
+        // Tirage uniforme dans l'intervalle [min, max].
         return random.nextInt(max - min + 1) + min;
     }
 
@@ -85,6 +91,7 @@ public class Dice {
      */
     @Override
     public String toString() {
+        // Resume compact des bornes actuelles du de.
         return "Dice{" +
                 "min=" + min +
                 ", max=" + max +

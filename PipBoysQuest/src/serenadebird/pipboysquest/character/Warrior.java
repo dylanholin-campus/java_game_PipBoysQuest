@@ -13,10 +13,15 @@ public class Warrior extends Character {
      * @param name nom du personnage
      */
     public Warrior(String name) {
+        // Definit le type metier et le nom.
         super("Warrior", name);
+        // Profil de base: plus de vie et de force que le wizard.
         setHealthLevel(120);
-        setAttackStrength(15);
-        setOffensiveEquipment(new Weapon("Laser Rifle", 5));
+        // Equipement de depart offensif.
+        setOffensiveEquipment(new Weapon("Fusil laser", 7));
+        // La force affichée inclut toujours l'equipement offensif courant.
+        setAttackStrength(computeAttackWithEquipment(getOffensiveEquipment()));
+        // Equipement de depart defensif.
         setDefensiveEquipment(new Shield("Power Armor Shield", 10));
     }
 
@@ -27,6 +32,7 @@ public class Warrior extends Character {
      */
     @Override
     public String getSpecialAction() {
+        // Action signature de la classe Warrior.
         return "Charge brutale";
     }
 
@@ -37,6 +43,7 @@ public class Warrior extends Character {
      */
     @Override
     public String toString() {
+        // Reutilise le resume parent puis ajoute la competence speciale.
         return super.toString() + ", Action speciale : " + getSpecialAction();
     }
 }

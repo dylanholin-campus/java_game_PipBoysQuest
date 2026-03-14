@@ -9,7 +9,9 @@ public class Weapon extends OffensiveEquipment {
     /**
      * Construit une arme par defaut.
      */
+    // Initialise une arme basique avec un bonus minimal.
     public Weapon() {
+        // Type metier fixe + valeurs de depart.
         super("Weapon", "Basic Weapon", 1);
     }
 
@@ -19,7 +21,9 @@ public class Weapon extends OffensiveEquipment {
      * @param name nom de l'arme
      * @param attackLevel valeur d'attaque
      */
+    // Permet de definir une arme personnalisee (loot, equipement initial, etc.).
     public Weapon(String name, int attackLevel) {
+        // Conserve le type "Weapon" et applique les parametres fournis.
         super("Weapon", name, attackLevel);
     }
 
@@ -29,6 +33,7 @@ public class Weapon extends OffensiveEquipment {
      * @return description de l'arme
      */
     @Override
+    // Prefixe le rendu parent pour expliciter la famille d'equipement.
     public String toString() {
         return "Arme " + super.toString();
     }

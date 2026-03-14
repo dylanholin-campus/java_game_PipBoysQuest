@@ -4,49 +4,41 @@
 
 > **Journal du Pip-Boy:** les Terres Desolees n'attendent personne.
 
-Jeu d'aventure tour par tour en Java, dans une ambiance Fallout: exploration, rencontres hostiles, loot, choix tactiques et progression de personnage.
+Jeu d'aventure tour par tour en Java, ambiance Fallout: progression sur plateau, combats interactifs, loot, decisions tactiques et progression du hero.
 
 ---
 
 ## Sommaire
 
 - [Apercu](#apercu)
-- [Classes jouables](#classes-jouables)
 - [Guide joueur](#guide-joueur)
-- [Contenu du package dist](#contenu-du-package-dist)
 - [Guide developpeur](#guide-developpeur)
+- [Smoke test gameplay](#smoke-test-gameplay)
 - [Documentation](#documentation)
 
 ---
 
 ## Apercu
 
-Dans `PipBoysQuest`, vous incarnez un survivant et avancez case par case sur un plateau dangereux.
+Dans `PipBoysQuest`, vous incarnez un survivant et avancez case par case sur un plateau de 64 cases.
 
-- Exploration de zones hostiles
-- Combats tour par tour
-- Loot d'equipements offensifs/defensifs
+- Rencontres ennemies avec choix d'action
+- Combat tour par tour (`Attaquer` / `Tenter de fuir`)
+- Loot d'armes et de potions avec confirmation `(o/n)`
 - Interface texte avec fenetre Swing style Pip-Boy
 - Sauvegarde MySQL quand la base est disponible
 
-Si MySQL est indisponible, le jeu demarre en mode hors-ligne (sans sauvegarde/chargement BDD).
-
----
-
-## Classes jouables
-
-- **Chevalier de l'Acier** (profil combat)
-- **Scribe** (profil technique/energie)
+Si MySQL est indisponible, le jeu tourne en mode hors-ligne (la partie reste jouable, sans persistance BDD).
 
 ---
 
 ## Guide joueur
 
-Vous pouvez jouer a `PipBoysQuest` sans compiler le projet.
+Vous pouvez jouer via le package `dist` sans compiler manuellement.
 
 ### Prerequis
 
-- Java 17+
+- Java 17+ (JRE ou JDK)
 - MySQL optionnel
 
 #### Ubuntu / Linux
@@ -64,37 +56,24 @@ sudo apt install openjdk-21-jdk
 
 ### Lancement rapide
 
-1. Dezipper **completement** `PipBoysQuest-dist.zip`
-2. Aller dans le dossier extrait `dist/`
-3. Lancer le script correspondant a votre OS
+1. Dezippez completement le package dist
+2. Aller dans le dossier `dist/`
+3. Lancer le script de votre OS
 
-#### Ubuntu / Linux
+#### Linux / macOS
 
 ```bash
 unzip PipBoysQuest-dist.zip
 cd dist
 ./run.sh
-# si besoin
-bash run.sh
 ```
 
 #### Windows
 
 ```bat
-extraire le zip puis double cliquer sur run.bat
+:: Extraire le zip, ouvrir un terminal dans dist, puis lancer:
+run.bat
 ```
-
----
-
-## Contenu du package dist
-
-Structure attendue apres extraction:
-
-- `app/PipBoysQuest.jar`
-- `run.sh`
-- `run.bat`
-- `lib/mysql-connector.jar`
-- `image/`
 
 ---
 
@@ -103,8 +82,7 @@ Structure attendue apres extraction:
 ### Prerequis
 
 - Java JDK 17+
-- MySQL local optionnel (utile pour sauvegarde/chargement)
-- Client SQL type Adminer (optionnel)
+- MySQL local optionnel
 
 ### Variables d'environnement BDD (optionnel)
 
@@ -114,24 +92,22 @@ export DB_USER='root'
 export DB_PASSWORD='votre_mot_de_passe'
 ```
 
-Si ces variables sont absentes, des valeurs par defaut sont utilisees.
-Si la connexion echoue, le jeu demarre en hors-ligne.
+Si ces variables sont absentes ou invalides, le jeu bascule en mode hors-ligne.
 
 ### Initialiser la base (optionnel)
 
-Executer `init_db.sql` a la racine du projet.
+Executez `init_db.sql` a la racine du projet.
 
-### Compiler et lancer depuis les sources
+### Build et run depuis les sources
 
-```bash
+#### Windows
+
+```bat
 cd PipBoysQuest
-javac -cp .:../lib/mysql-connector.jar @sources.txt
-java -cp .:src:../lib/mysql-connector.jar serenadebird.pipboysquest.main.Main
+scripts\build.bat
+cd dist
+run.bat
 ```
-
-### Generer un package dist
-
-Depuis la racine du repo:
 
 #### Linux / macOS
 
@@ -139,16 +115,49 @@ Depuis la racine du repo:
 cd PipBoysQuest
 chmod +x scripts/build.sh scripts/run.sh
 ./scripts/build.sh
+cd dist
+./run.sh
 ```
 
-#### Windows
+> Note Windows: `build.bat` et `run.bat` tentent de detecter Java automatiquement (`JAVA_HOME`, `.jdks`, puis `PATH`).
+
+---
+
+## Smoke test gameplay
+
+`GameplaySmokeTest` est un garde-fou rapide pour valider les interactions critiques sans lancer l'UI Swing.
+
+Classe:
+
+- `PipBoysQuest/src/serenadebird/pipboysquest/main/GameplaySmokeTest.java`
+
+Scenarios verifies:
+
+1. victoire combat + loot arme
+2. fuite reussie (deterministe)
+3. utilisation d'un Stimpack (+20)
+
+### Execution
+
+#### Windows (recommande)
 
 ```bat
 cd PipBoysQuest
 scripts\build.bat
+java -cp ".\build\classes" serenadebird.pipboysquest.main.GameplaySmokeTest
 ```
 
-Le build genere `PipBoysQuest/dist/`, pret a zipper et partager.
+#### Windows (si java n'est pas dans le PATH)
+
+```bat
+cd PipBoysQuest
+scripts\build.bat
+"C:\Users\user\.jdks\openjdk-25.0.2\bin\java.exe" -cp ".\build\classes" serenadebird.pipboysquest.main.GameplaySmokeTest
+```
+
+Si tout est correct, la sortie se termine par:
+
+`[SMOKE TEST] OK - combat, fuite et loot (arme/potion) interactifs valides.`
 
 ---
 
@@ -157,14 +166,7 @@ Le build genere `PipBoysQuest/dist/`, pret a zipper et partager.
 - Schema UML: https://dylanholin-campus.github.io/java_game_PipBoysQuest/
 - Javadoc locale: `PipBoysQuest/docs/javadoc/index.html`
 
-### Prerequis Javadoc (Ubuntu / Linux)
-
-```bash
-sudo apt update
-sudo apt install default-jdk
-```
-
-### Generation Javadoc
+Generation Javadoc:
 
 ```bash
 cd PipBoysQuest

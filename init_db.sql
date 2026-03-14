@@ -44,11 +44,11 @@ CREATE TABLE `board_layout` (
     CellCode VARCHAR(40) NOT NULL
 );
 
--- Insertion de VOS données (Chevalier, Scribe, Raider)
+-- Presets de héros alignés sur les valeurs de départ du runtime Java.
 INSERT INTO `character` (Type, Name, LifePoints, Strength, OffensiveEquipment, DefensiveEquipment)
 VALUES
-    ('Warrior', 'Chevalier', 150, 20, 'Laser Rifle', 'Power Armor'),
-    ('Wizard', 'Scribe', 100, 15, 'Pistolet Gamma', NULL);
+    ('Warrior', 'Chevalier', 120, 15, 'Fusil laser', 'Power Armor Shield'),
+    ('Wizard', 'Scribe', 100, 12, 'Pistolet gamma', 'Stimpack');
 
 INSERT INTO `enemy_catalog` (EnemyType, Name, DangerLevel)
 VALUES
@@ -56,14 +56,35 @@ VALUES
     ('Sorcerer', 'Sorcier techno-raider', 6),
     ('Goblin', 'Gobelin feral', 4);
 
+-- Catalogue offensif aligné sur `WeaponCatalog`.
 INSERT INTO `item_catalog` (ItemClass, ItemType, Name, ValueLevel)
 VALUES
-    ('OFFENSIVE', 'Mace', 'Massue rouillee', 3),
-    ('OFFENSIVE', 'Sword', 'Epee de recuperation', 4),
-    ('OFFENSIVE', 'Lightning', 'Eclair ionique', 5),
-    ('OFFENSIVE', 'Fireball', 'Boule de feu plasma', 6),
-    ('DEFENSIVE', 'StandardPotion', 'Potion standard', 2),
-    ('DEFENSIVE', 'LargePotion', 'Grande potion', 5);
+    ('OFFENSIVE', 'Weapon', 'Pistolet 9 mm classique', 3),
+    ('OFFENSIVE', 'Weapon', 'Pistolet 9 mm classique', 3),
+    ('OFFENSIVE', 'Weapon', 'Pistolet 9 mm classique', 3),
+    ('OFFENSIVE', 'Weapon', 'Carabine a plomb', 4),
+    ('OFFENSIVE', 'Weapon', 'Carabine a plomb', 4),
+    ('OFFENSIVE', 'Weapon', 'Carabine a plomb', 4),
+    ('OFFENSIVE', 'Weapon', 'Pistolet silencieux', 5),
+    ('OFFENSIVE', 'Weapon', 'Pistolet silencieux', 5),
+    ('OFFENSIVE', 'Weapon', 'Pistolet silencieux', 5),
+    ('OFFENSIVE', 'Weapon', 'Revolver de mercenaire', 6),
+    ('OFFENSIVE', 'Weapon', 'Revolver de mercenaire', 6),
+    ('OFFENSIVE', 'Weapon', 'Revolver de mercenaire', 6),
+    ('OFFENSIVE', 'Weapon', 'Hache de barbare', 7),
+    ('OFFENSIVE', 'Weapon', 'Hache de barbare', 7),
+    ('OFFENSIVE', 'Weapon', 'Carabine a levier', 11),
+    ('OFFENSIVE', 'Weapon', 'Carabine a levier', 11),
+    ('OFFENSIVE', 'Weapon', 'Lance-ferraille', 13),
+    ('OFFENSIVE', 'Weapon', 'Lance-ferraille', 13),
+    ('OFFENSIVE', 'Weapon', 'Fusil de combat tactique', 18),
+    ('OFFENSIVE', 'Weapon', 'Fusil de combat tactique', 18),
+    ('OFFENSIVE', 'Weapon', 'Fusil Gauss', 26),
+    ('OFFENSIVE', 'Weapon', 'Fat Man', 28),
+    ('OFFENSIVE', 'Weapon', 'Final Judgment', 30),
+    -- Catalogue défensif aligné sur `PotionCatalog`.
+    ('DEFENSIVE', 'StandardPotion', 'Stimpack', 20),
+    ('DEFENSIVE', 'LargePotion', 'Super Stimpack', 40);
 
 -- Le layout du plateau est desormais aleatoire.
 -- La table `board_layout` est remplie au demarrage du jeu (generation Java),
