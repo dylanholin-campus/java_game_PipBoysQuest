@@ -45,7 +45,7 @@ Vous pouvez jouer via le package `dist` sans compiler manuellement.
 
 ```bash
 sudo apt update
-sudo apt install openjdk-21-jdk
+sudo apt install openjdk-25-jdk
 ```
 
 #### Windows (`run.bat`)
@@ -65,6 +65,7 @@ sudo apt install openjdk-21-jdk
 ```bash
 unzip PipBoysQuest-dist.zip
 cd dist
+chmod u+x run.sh
 ./run.sh
 ```
 
