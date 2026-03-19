@@ -63,7 +63,7 @@ sudo apt install openjdk-25-jdk
 #### Linux / macOS
 
 ```bash
-unzip PipBoysQuest-dist.zip
+unzip PipBoysQuest_v1.1.zip
 cd dist
 chmod u+x run.sh
 ./run.sh
